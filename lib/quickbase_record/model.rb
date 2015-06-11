@@ -16,8 +16,8 @@ module QuickbaseRecord
         @fields ||= FieldMapping.new(fields_hash).fields
       end
 
-      def define_fields(&block)
-        fields(block.call)
+      def define_fields(fields)
+        fields(fields)
       end
     end
 
