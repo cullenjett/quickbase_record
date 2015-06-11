@@ -33,8 +33,6 @@ module QuickbaseRecord
       false
     end
 
-    private
-
     def create_attr_accesssors
       self.class.fields.each do |field_name, fid|
         self.class.send(:attr_accessor, field_name)

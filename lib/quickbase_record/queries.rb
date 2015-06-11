@@ -156,5 +156,6 @@ module QuickbaseRecord
 
       return successful ? self.id : false
     end
+
   end
 end
