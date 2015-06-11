@@ -96,8 +96,23 @@ RSpec.describe QuickbaseRecord::Queries do
     it "doesn't save the object" do
       teacher = TeacherFake.new(name: 'teacher1', salary: 35000)
       teacher.assign_attributes(name: 'teacher2', salary: 40000)
-      puts "TEACHER: #{teacher.inspect}"
       expect(teacher.id).to be_falsey
+    end
+  end
+
+  describe '#update_attributes' do
+    it "assigns an objects attributes given a hash attributes and their values" do
+      teacher = TeacherFake.new(name: 'teacher1', salary: 35000)
+      teacher.update_attributes(name: 'teacher2', salary: 40000)
+      expect(teacher.name).to eq('teacher2')
+      expect(teacher.salary).to eq(40000)
+    end
+
+    it "saves the object" do
+      teacher = TeacherFake.new(name: 'teacher1', salary: 35000)
+      teacher.update_attributes(name: 'teacher2', salary: 40000)
+      expect(teacher.id).to be_truthy
+      teacher.delete
     end
   end
 

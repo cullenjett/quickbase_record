@@ -157,5 +157,10 @@ module QuickbaseRecord
       return successful ? self.id : false
     end
 
+    def update_attributes(attributes={})
+      self.assign_attributes(attributes)
+      self.save
+      return self
+    end
   end
 end
