@@ -58,8 +58,7 @@ RSpec.describe QuickbaseRecord::Queries do
     it "creates a new record for an object without an ID and sets it's new ID" do
       cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
       new_id = cullen.save
-      # Note: I'm expecting > 1 (and an integer) because idk what cullen's new RID will be, but I know it should be > 1...
-      expect(new_id).to be > 1
+      expect(new_id).to be_truthy
       expect(cullen.id).to eq(new_id)
     end
 
@@ -67,7 +66,7 @@ RSpec.describe QuickbaseRecord::Queries do
       cullen = TeacherFake.where(name: 'Cullen Jett').first
       cullen.subject = 'Ruby on Rails'
       cullen.name = "THE #{cullen.name}"
-      expect(cullen.save).to be > 1
+      expect(cullen.save).to be_truthy
       cullen.delete
     end
   end
