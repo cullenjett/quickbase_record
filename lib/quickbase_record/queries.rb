@@ -36,6 +36,13 @@ module QuickbaseRecord
         return array_of_new_objects
       end
 
+      def create(attributes={})
+        raise StandardErrror, "You cannot call #{self}.create() with an :id attribute" if attributes.include?(:id)
+        object = new(attributes)
+        object.save
+        return object
+      end
+
       def query(query_string)
         query_options = { query: build_query(query_string), clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
