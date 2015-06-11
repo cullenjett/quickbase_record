@@ -1,6 +1,6 @@
 # QuickbaseRecord
 
-QuickbaseRecord is an ActiveRecord-style ORM for using the Intuit QuickBase platform as a database.
+QuickbaseRecord is an ActiveRecord-style ORM for using the Intuit QuickBase platform as a database for Ruby or Ruby on Rails applications.
 
 ## Installation
 
@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 ### Initialize the API Client
-QuickbaseRecord is built on top of the [Advantage Quickbase](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem) gem to make the API calls to QuickBase, so you'll need to configure Quickbaserecord with your app's realm name and provide a valid username and password. This can be done in a single initializer file with a call to `QuickbaseRecords.configure`, making sure to keep your credentials safe from the world.
+QuickbaseRecord is built on top of the [Advantage Quickbase](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem) gem to make the API calls to QuickBase, so you'll need to configure QuickbaseRecord with your app's realm name and provide a valid username and password. This can be done in a single initializer file with a call to `QuickbaseRecords.configure`, making sure to keep your credentials safe from the world.
 
 ```
   # config/initializers/quickbase_record.rb
@@ -54,7 +54,8 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
 ```
 **IMPORTANT:** You must supply a key/value pair for :dbid and :id (QuickbaseRecord uses :id instead of :record_id to look more like standard ActiveRecord models)
 
-This will give your class a number of methods for interacting with your QuickBase application similar to ActiveRecord.
+### What You Get
+Classes that include QuickbaseRecord::Model and define their fields will have a handful of class and instance methods for interacting with your QuickBase application similar to ActiveRecord. The goal is to be able to use QuickBase as a database and treat your models the same way you would with a traditional database.
 
 ```
 @post = Posts.find(1) => <Post: @id=1, @content="Amazing post content", @author: 'Cullen Jett'>
@@ -75,7 +76,12 @@ This will give your class a number of methods for interacting with your QuickBas
 etc.
 ```
 
-Also included/extended are ActiveModel::Naming, ActiveModel::Callbacks, ActiveModel::Validations, and ActiveModel::Conversion ([see ActiveModel docs for details](https://github.com/rails/rails/tree/master/activemodel/lib/active_model))
+
+Also included/extended are ActiveModel::Naming, ActiveModel::Callbacks, ActiveModel::Validations, and ActiveModel::Conversion ([see ActiveModel docs for details](https://github.com/rails/rails/tree/master/activemodel/lib/active_model)). The biggest benefit here is the availability of `.validates` on your class to validate attributes and capture invalid attributes with `#valid?`.
+
+Be aware that validations needing context from the database (i.e. `validates_uniqueness_of`) are not yet supported and will need to be implemented manually.
+
+Database callbacks (i.e. `before_save :create_token!`) are not fully functional yet, so stay tuned.
 
 ## Available Methods
   * **.create(attributes_hash)**
@@ -163,6 +169,13 @@ Also included/extended are ActiveModel::Naming, ActiveModel::Callbacks, ActiveMo
       @post.assign_attributes(author: 'Socrates', content: 'Something enlightening...')
       @post.save
     ```
+
+## Testing
+Unfortunately you will not be able to run the test suite unless you have access to the QuickBase application used as the test database *or* you create your own QuickBase app to test against that mimics the test fakes. Eventually the test calls will be stubbed out so anyone can test it, but I've got stuff to do -- pull requests are welcome :)
+
+As of now the tests serve more as documentation for those who don't have access to the testing QuickBase app.
+
+If you're lucky enough to work with me then I can grant you access to the app and you can run the suite until your fingers bleed. You'll just need to modify `spec/quickbase_record_config.rb` to use your own credentials.
 
 ## Contributing
 
