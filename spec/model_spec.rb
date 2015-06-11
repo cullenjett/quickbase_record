@@ -3,7 +3,7 @@ require './spec/fakes/student_fake'
 RSpec.describe QuickbaseRecord::Model do
   describe '.configure' do
     it "sets the field mapping for field names to FIDs on the class' configuration object" do
-      expect(StudentFake.configuration.fields[:id]).to eq(3)
+      expect(StudentFake.fields[:id]).to eq(3)
     end
   end
 

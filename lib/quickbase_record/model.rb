@@ -1,23 +1,23 @@
 module QuickbaseRecord
   module Model
     extend ActiveSupport::Concern
-    include ActiveModel::Validations
-    include ActiveModel::Conversion
     include QuickbaseRecord::Queries
     include QuickbaseRecord::Client
 
     included do
       extend QuickbaseRecord::Queries
       extend ActiveModel::Naming
+      include ActiveModel::Validations
+      include ActiveModel::Conversion
     end
 
     module ClassMethods
-      def configuration
-        @@configuration ||= Configuration.new
+      def fields(fields_hash={})
+        @fields ||= FieldMapping.new(fields_hash).fields
       end
 
-      def configure
-        yield configuration
+      def define_fields(&block)
+        fields(block.call)
       end
     end
 
@@ -35,7 +35,7 @@ module QuickbaseRecord
     private
 
     def create_attr_accesssors
-      self.class.configuration.fields.each do |field_name, fid|
+      self.class.fields.each do |field_name, fid|
         self.class.send(:attr_accessor, field_name)
       end
     end

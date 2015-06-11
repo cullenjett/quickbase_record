@@ -9,8 +9,8 @@ end
 class TeacherFake
   include QuickbaseRecord::Model
 
-  configure do |config|
-    config.fields = {
+  define_fields do
+    {
       dbid: "bjzrx8cjn",
       id: 3,
       name: 6,

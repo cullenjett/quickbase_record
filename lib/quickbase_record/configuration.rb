@@ -1,16 +1,11 @@
 module QuickbaseRecord
   class Configuration
-    attr_accessor :realm, :username, :password, :fields
+    attr_accessor :realm, :username, :password
 
     def initialize
       @realm = ''
       @username = ''
       @password = ''
-      @fields = {}
-    end
-
-    def [] key
-      fields[key]
     end
   end
 end

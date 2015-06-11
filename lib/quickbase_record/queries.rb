@@ -1,4 +1,3 @@
-require_relative 'configuration'
 require_relative 'client'
 
 module QuickbaseRecord
@@ -9,10 +8,6 @@ module QuickbaseRecord
     UNWRITABLE_FIELDS = ['dbid', 'id', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
 
     module ClassMethods
-      def fields
-        @fields ||= self.configuration.fields
-      end
-
       def dbid
         @dbid ||= fields[:dbid]
       end
@@ -91,11 +86,11 @@ module QuickbaseRecord
       end
 
       def convert_field_name_to_fid(field_name)
-        self.configuration[field_name.to_sym].to_s
+        self.fields[field_name.to_sym].to_s
       end
 
       def covert_fid_to_field_name(fid)
-        self.configuration.fields.invert[fid.to_i]
+        self.fields.invert[fid.to_i]
       end
 
       def convert_quickbase_response(response)
