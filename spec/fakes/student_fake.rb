@@ -6,16 +6,16 @@ QuickbaseRecord.configure do |config|
   config.password = ENV["QB_PASSWORD"]
 end
 
-class TeacherFake
+class StudentFake
   include QuickbaseRecord::Model
 
   configure do |config|
     config.fields = {
-      dbid: "bjzrx8cjn",
+      dbid: 'bjzrx8ckw',
       id: 3,
       name: 6,
-      subject: 7,
-      salary: 8
+      grade: 7,
+      email: 8
     }
   end
 end

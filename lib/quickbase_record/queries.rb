@@ -145,5 +145,12 @@ module QuickbaseRecord
       self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
     end
 
+    def delete
+      return false if !self.id
+
+      successful = qb_client.delete_record(self.class.dbid, self.id)
+
+      return successful ? self.id : false
+    end
   end
 end
