@@ -4,11 +4,7 @@ module QuickbaseRecord
 
     module ClassMethods
       def qb_client
-        realm = QuickbaseRecord.configuration.realm
-        username = QuickbaseRecord.configuration.username
-        password = QuickbaseRecord.configuration.password
-
-        @qb_client ||= AdvantageQuickbase::API.new(realm, username, password)
+        self.new.qb_client
       end
     end
 

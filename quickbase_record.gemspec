@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = QuickbaseRecord::VERSION
   spec.authors       = ["Cullen Jett"]
   spec.email         = ["cullenjett@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = "QuickbaseRecord is an ActiveRecord-style ORM for using Intuit QuickBase tables as models."
+  spec.description   = "QuickbaseRecord is an ActiveRecord-style ORM for using Intuit QuickBase tables as models."
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,4 +20,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "shoulda-matchers"
+
+  spec.add_runtime_dependency "advantage_quickbase"
+  spec.add_runtime_dependency "activesupport"
+  spec.add_runtime_dependency "activemodel"
 end

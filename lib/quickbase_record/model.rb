@@ -13,7 +13,7 @@ module QuickbaseRecord
 
     module ClassMethods
       def configuration
-        @configuration ||= Configuration.new
+        @@configuration ||= Configuration.new
       end
 
       def configure

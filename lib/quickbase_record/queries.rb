@@ -42,8 +42,7 @@ module QuickbaseRecord
       end
 
       def query(query_string)
-        query_string = convert_query_string(query_string)
-        query_options = { query: query_string, clist: clist }
+        query_options = { query: build_query(query_string), clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
 
         array_of_new_objects = query_response.map do |response|
@@ -55,26 +54,40 @@ module QuickbaseRecord
       end
 
       def build_query(query_hash)
-        return query_hash if query_hash.is_a? String
+        return convert_query_string(query_hash) if query_hash.is_a? String
 
         query_hash.map do |field_name, values|
           fid = convert_field_name_to_fid(field_name)
           if values.is_a? Array
             join_with_or(fid, values)
+          elsif values.is_a? Hash
+            join_with_custom(fid, values)
           else
             join_with_and(fid, values)
           end
         end.join("AND")
       end
 
-      def join_with_and(fid, value)
-        "{'#{fid}'.EX.'#{value}'}"
+      def join_with_and(fid, value, comparitor="EX")
+        "{'#{fid}'.#{comparitor}.'#{value}'}"
       end
 
-      def join_with_or(fid, array)
+      def join_with_or(fid, array, comparitor="EX")
         array.map do |value|
-          "{'#{fid}'.EX.'#{value}'}"
+          "{'#{fid}'.#{comparitor}.'#{value}'}"
         end.join("OR")
+      end
+
+      def join_with_custom(fid, hash)
+        comparitor = hash.keys.first
+        value = hash.values.first
+
+        if value.is_a? Array
+          join_with_or(fid, value, comparitor)
+        else
+          "{'#{fid}'.#{comparitor}.'#{value}'}"
+        end
+
       end
 
       def convert_field_name_to_fid(field_name)
@@ -97,15 +110,27 @@ module QuickbaseRecord
       end
 
       def convert_query_string(query_string)
+        match_found = false
+
+        query_string_uses_field_name = query_string.match(/\{'?(.*)'?\..*\.'?.*'?\}/)[1].to_i == 0
+
+        if !query_string_uses_field_name
+          return query_string
+        end
+
         fields.each do |field_name, fid|
           field_name = field_name.to_s
           match_string = "\{'?(#{field_name})'?\..*\.'?.*'?\}"
           if query_string.scan(/#{match_string}/).length > 0
             query_string.gsub!(field_name, fid.to_s)
+            match_found = true
           end
         end
 
-        puts "QUERY STRING: #{query_string}"
+        if !match_found
+          raise ArgumentError, "Invalid arguments on #{self}.query() - no matching field name found. \nMake sure the field is part of your class configuration."
+        end
+
         query_string
       end
     end
