@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["cullenjett@gmail.com"]
   spec.summary       = "An ActiveRecord-style ORM for using Intuit QuickBase tables as models."
   spec.description   = "QuickbaseRecord is a baller ActiveRecord-style ORM for using the Intuit QuickBase platform as a database for Ruby or Ruby on Rails applications."
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/cullenjett/quickbase_record"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
