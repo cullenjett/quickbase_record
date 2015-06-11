@@ -63,6 +63,8 @@ module QuickbaseRecord
         end.join("AND")
       end
 
+      private
+
       def join_with_and(fid, value, comparitor="EX")
         "{'#{fid}'.#{comparitor}.'#{value}'}"
       end
@@ -107,9 +109,9 @@ module QuickbaseRecord
       def convert_query_string(query_string)
         match_found = false
 
-        query_string_uses_field_name = query_string.match(/\{'?(.*)'?\..*\.'?.*'?\}/)[1].to_i == 0
+        uses_field_name = query_string.match(/\{'?(.*)'?\..*\.'?.*'?\}/)[1].to_i == 0
 
-        if !query_string_uses_field_name
+        if !uses_field_name
           return query_string
         end
 

@@ -7,6 +7,7 @@ module QuickbaseRecord
     included do
       extend QuickbaseRecord::Queries
       extend ActiveModel::Naming
+      extend ActiveModel::Callbacks
       include ActiveModel::Validations
       include ActiveModel::Conversion
     end

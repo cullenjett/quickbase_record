@@ -5,9 +5,5 @@ module QuickbaseRecord
     def initialize(fields={})
       @fields = fields
     end
-
-    def [] key
-      fields[key]
-    end
   end
 end
