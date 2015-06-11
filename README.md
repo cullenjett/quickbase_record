@@ -132,6 +132,13 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
       Posts.query("{author.XEX.'Cullen Jett'}")
     ```
 
+  * **.qid(id)**
+    - Accepts a QID (QuickBase report ID)
+    - Returns an array of objects
+    ```
+      Posts.qid(1)
+    ```
+
   * **#save**
     - Creates a new record in QuickBase for objects that don't have an ID *or* edits the corresponding QuickBase record if the object already has an ID
     - Returns the object (if #save created a record in QuickBase the the returned object will now have an ID)

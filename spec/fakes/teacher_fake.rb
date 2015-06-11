@@ -10,5 +10,4 @@ class TeacherFake
     :subject => 7,
     :salary => 8
   })
-
 end

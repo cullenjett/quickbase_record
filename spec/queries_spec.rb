@@ -54,6 +54,18 @@ RSpec.describe QuickbaseRecord::Queries do
     end
   end
 
+  describe '.qid' do
+    it "returns an array of objects" do
+      teachers = TeacherFake.qid(1)
+      expect(teachers).to be_a Array
+    end
+
+    it "returns an object of the Teacher class" do
+      teachers = TeacherFake.qid(1)
+      expect(teachers.first).to be_a TeacherFake
+    end
+  end
+
   describe '#save' do
     it "creates a new record for an object without an ID and sets it's new ID" do
       cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')

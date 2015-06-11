@@ -55,6 +55,18 @@ module QuickbaseRecord
         return array_of_new_objects
       end
 
+      def qid(id)
+        query_options = { qid: id, clist: clist }
+        query_response = qb_client.do_query(dbid, query_options)
+
+        array_of_new_objects = query_response.map do |response|
+          converted_response = convert_quickbase_response(response)
+          new(converted_response)
+        end
+
+        return array_of_new_objects
+      end
+
       def build_query(query_hash)
         return convert_query_string(query_hash) if query_hash.is_a? String
 
