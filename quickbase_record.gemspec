@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = QuickbaseRecord::VERSION
   spec.authors       = ["Cullen Jett"]
   spec.email         = ["cullenjett@gmail.com"]
-  spec.summary       = "QuickbaseRecord is an ActiveRecord-style ORM for using Intuit QuickBase tables as models."
-  spec.description   = "QuickbaseRecord is an ActiveRecord-style ORM for using Intuit QuickBase tables as models."
+  spec.summary       = "An ActiveRecord-style ORM for using Intuit QuickBase tables as models."
+  spec.description   = "QuickbaseRecord is a baller ActiveRecord-style ORM for using the Intuit QuickBase platform as a database for Ruby or Ruby on Rails applications."
   spec.homepage      = ""
   spec.license       = "MIT"
 

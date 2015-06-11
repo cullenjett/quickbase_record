@@ -1,6 +1,6 @@
 # QuickbaseRecord
 
-QuickbaseRecord is an ActiveRecord-style ORM for using the Intuit QuickBase platform as a database for Ruby or Ruby on Rails applications.
+QuickbaseRecord is a baller ActiveRecord-style ORM for using the Intuit QuickBase platform as a database for Ruby or Ruby on Rails applications.
 
 ## Installation
 
