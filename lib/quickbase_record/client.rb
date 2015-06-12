@@ -12,8 +12,9 @@ module QuickbaseRecord
       realm = QuickbaseRecord.configuration.realm
       username = QuickbaseRecord.configuration.username
       password = QuickbaseRecord.configuration.password
+      token = QuickbaseRecord.configuration.token
 
-      @qb_client ||= AdvantageQuickbase::API.new(realm, username, password)
+      @qb_client ||= AdvantageQuickbase::API.new(realm, username, password, token)
     end
   end
 end
