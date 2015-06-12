@@ -123,13 +123,11 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
       # {'8'.XEX.'Cullen Jett'}
     ```
 
-  * **.query(qb_query_string)**
-    - Accepts a string in the standard QuickBase query format
-    - Returns an array of objects
-    - Works with field names or FIDs
+    - Also accepts a string in the standard QuickBase query format
+      * Works with field names or FIDs
     ```
-      Posts.query("{'3'.EX.'1'}")
-      Posts.query("{author.XEX.'Cullen Jett'}")
+      Posts.where("{'3'.EX.'1'}")
+      Posts.where("{author.XEX.'Cullen Jett'}")
     ```
 
   * **.qid(id)**
