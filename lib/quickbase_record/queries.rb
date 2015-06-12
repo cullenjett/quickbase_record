@@ -19,8 +19,10 @@ module QuickbaseRecord
       def find(id)
         query_options = { query: build_query(id: id), clist: clist }
         query_response = qb_client.do_query(dbid, query_options).first
-        converted_response = convert_quickbase_response(query_response)
 
+        return false if query_response.nil?
+
+        converted_response = convert_quickbase_response(query_response)
         new(converted_response)
       end
 
@@ -28,12 +30,7 @@ module QuickbaseRecord
         query_options = { query: build_query(query_hash), clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
 
-        array_of_new_objects = query_response.map do |response|
-          converted_response = convert_quickbase_response(response)
-          new(converted_response)
-        end
-
-        return array_of_new_objects
+        build_array_of_new_objects(query_response)
       end
 
       def create(attributes={})
@@ -43,28 +40,11 @@ module QuickbaseRecord
         return object
       end
 
-      def query(query_string)
-        query_options = { query: build_query(query_string), clist: clist }
-        query_response = qb_client.do_query(dbid, query_options)
-
-        array_of_new_objects = query_response.map do |response|
-          converted_response = convert_quickbase_response(response)
-          new(converted_response)
-        end
-
-        return array_of_new_objects
-      end
-
       def qid(id)
         query_options = { qid: id, clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
 
-        array_of_new_objects = query_response.map do |response|
-          converted_response = convert_quickbase_response(response)
-          new(converted_response)
-        end
-
-        return array_of_new_objects
+        build_array_of_new_objects(query_response)
       end
 
       def build_query(query_hash)
@@ -83,6 +63,13 @@ module QuickbaseRecord
       end
 
       private
+
+      def build_array_of_new_objects(query_response)
+        query_response.map do |response|
+          converted_response = convert_quickbase_response(response)
+          new(converted_response)
+        end
+      end
 
       def join_with_and(fid, value, comparitor="EX")
         "{'#{fid}'.#{comparitor}.'#{value}'}"
@@ -122,17 +109,14 @@ module QuickbaseRecord
           result[field_name] = value
         end
 
-        result
+        return result
       end
 
       def convert_query_string(query_string)
         match_found = false
-
         uses_field_name = query_string.match(/\{'?(.*)'?\..*\.'?.*'?\}/)[1].to_i == 0
 
-        if !uses_field_name
-          return query_string
-        end
+        return query_string unless uses_field_name
 
         fields.each do |field_name, fid|
           field_name = field_name.to_s
@@ -147,7 +131,7 @@ module QuickbaseRecord
           raise ArgumentError, "Invalid arguments on #{self}.query() - no matching field name found. \nMake sure the field is part of your class configuration."
         end
 
-        query_string
+        return query_string
       end
     end
 
@@ -159,17 +143,17 @@ module QuickbaseRecord
         current_object[self.class.fields[:id]] = self.id if self.id
       end
       self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
+      return self
     end
 
     def delete
       return false if !self.id
-
       successful = qb_client.delete_record(self.class.dbid, self.id)
-
       return successful ? self.id : false
     end
 
     def update_attributes(attributes={})
+      return false if attributes.blank?
       self.assign_attributes(attributes)
       self.save
       return self

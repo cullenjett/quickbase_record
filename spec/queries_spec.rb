@@ -11,6 +11,11 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher = TeacherFake.find(1)
       expect(teacher).to be_a TeacherFake
     end
+
+    it "returns false if no QuickBase records are found" do
+      teacher = TeacherFake.find(999999)
+      expect(teacher).to be false
+    end
   end
 
   describe '.where' do
@@ -23,6 +28,16 @@ RSpec.describe QuickbaseRecord::Queries do
       teachers = TeacherFake.where(id: 1)
       expect(teachers.first).to be_a TeacherFake
     end
+
+    it "accepts a string in QuickBase query format" do
+      teachers = TeacherFake.where("{'3'.EX.'1'}")
+      expect(teachers.first.id).to eq('1')
+    end
+
+    it "accepts a string in QuickBase query format using field names" do
+      teachers = TeacherFake.where("{'id'.EX.'1'}")
+      expect(teachers.first.id).to eq('1')
+    end
   end
 
   describe '.create' do
@@ -34,23 +49,6 @@ RSpec.describe QuickbaseRecord::Queries do
 
     it "throws an error if an :id argument is passed" do
       expect { TeacherFake.create(id: 1, name: 'Professor Dumbledore') }.to raise_error
-    end
-  end
-
-  describe '.query' do
-    it "returns an array of objects" do
-      teachers = TeacherFake.query("{id.EX.'1'}")
-      expect(teachers).to be_a Array
-    end
-
-    it "returns an object of the Teacher class" do
-      teachers = TeacherFake.query("{id.EX.'1'}")
-      expect(teachers.first).to be_a TeacherFake
-    end
-
-    it "accepts FIDs instead of field names" do
-      teachers = TeacherFake.query("{'3'.EX.'1'}")
-      expect(teachers.first.id).to eq('1')
     end
   end
 
@@ -67,18 +65,22 @@ RSpec.describe QuickbaseRecord::Queries do
   end
 
   describe '#save' do
-    it "creates a new record for an object without an ID and sets it's new ID" do
+    it "creates a new record in QuickBase for an object without an ID and sets it's new ID" do
       cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
-      new_id = cullen.save
-      expect(new_id).to be_truthy
-      expect(cullen.id).to eq(new_id)
+      cullen.save
+      expect(cullen.id).to be_truthy
+    end
+
+    it "returns the object on successful save" do
+      cullen = TeacherFake.where(name: 'Cullen Jett').first
+      expect(cullen.save).to be_a TeacherFake
     end
 
     it "edits an object that has an existing ID" do
       cullen = TeacherFake.where(name: 'Cullen Jett').first
       cullen.subject = 'Ruby on Rails'
       cullen.name = "THE #{cullen.name}"
-      expect(cullen.save).to be_truthy
+      expect(cullen.save.id).to be_truthy
       cullen.delete
     end
   end
@@ -117,6 +119,7 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher.update_attributes(name: 'teacher2', salary: 40000)
       expect(teacher.name).to eq('teacher2')
       expect(teacher.salary).to eq(40000)
+      teacher.delete
     end
 
     it "saves the object" do
@@ -124,6 +127,12 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher.update_attributes(name: 'teacher2', salary: 40000)
       expect(teacher.id).to be_truthy
       teacher.delete
+    end
+
+    it "returns false if no attributes are passed" do
+      teacher = TeacherFake.new()
+      teacher.update_attributes()
+      expect(teacher.update_attributes()).to be false
     end
   end
 
