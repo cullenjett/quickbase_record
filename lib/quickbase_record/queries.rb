@@ -30,6 +30,8 @@ module QuickbaseRecord
         query_options = { query: build_query(query_hash), clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
 
+        return false if query_response.first.nil?
+
         build_array_of_new_objects(query_response)
       end
 

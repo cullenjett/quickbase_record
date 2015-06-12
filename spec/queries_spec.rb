@@ -38,6 +38,11 @@ RSpec.describe QuickbaseRecord::Queries do
       teachers = TeacherFake.where("{'id'.EX.'1'}")
       expect(teachers.first.id).to eq('1')
     end
+
+    it "returns false if no QuickBase records are found" do
+      teachers = TeacherFake.where(name: 'Not a real TeacherFake name...')
+      expect(teachers).to be false
+    end
   end
 
   describe '.create' do
