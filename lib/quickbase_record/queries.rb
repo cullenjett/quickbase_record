@@ -20,7 +20,7 @@ module QuickbaseRecord
         query_options = { query: build_query(id: id), clist: clist }
         query_response = qb_client.do_query(dbid, query_options).first
 
-        return false if query_response.nil?
+        return nil if query_response.nil?
 
         converted_response = convert_quickbase_response(query_response)
         new(converted_response)
@@ -30,7 +30,7 @@ module QuickbaseRecord
         query_options = { query: build_query(query_hash), clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
 
-        return false if query_response.first.nil?
+        return [] if query_response.first.nil?
 
         build_array_of_new_objects(query_response)
       end
@@ -45,6 +45,8 @@ module QuickbaseRecord
       def qid(id)
         query_options = { qid: id, clist: clist }
         query_response = qb_client.do_query(dbid, query_options)
+
+        return [] if query_response.first.nil?
 
         build_array_of_new_objects(query_response)
       end

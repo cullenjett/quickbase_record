@@ -12,9 +12,9 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(teacher).to be_a TeacherFake
     end
 
-    it "returns false if no QuickBase records are found" do
+    it "returns nil if no QuickBase records are found" do
       teacher = TeacherFake.find(999999)
-      expect(teacher).to be false
+      expect(teacher).to eq(nil)
     end
   end
 
@@ -39,9 +39,9 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(teachers.first.id).to eq('1')
     end
 
-    it "returns false if no QuickBase records are found" do
+    it "returns an empty array if no QuickBase records are found" do
       teachers = TeacherFake.where(name: 'Not a real TeacherFake name...')
-      expect(teachers).to be false
+      expect(teachers).to eq([])
     end
   end
 
