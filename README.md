@@ -118,10 +118,19 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
       # {'8'.EX.'Socrates'}OR{'8'.EX.'Socrates'}
     ```
 
-    - To use a comparitor other than 'EX' pass the value as another hash with the key as the comparitor
+    - To use a comparator other than 'EX' pass the value as another hash with the key as the comparator
     ```
       Post.where(author: {XEX: 'Cullen Jett'})
       # {'8'.XEX.'Cullen Jett'}
+    ```
+
+    - Combine arrays and hashes to build more complex queries
+    ```
+      Post.where(id: [{XEX: 123}, {OBF: 'today'}])
+      # "{'3'.XEX.'123'}OR{'3'.OAF.'today'}"
+
+      Post.where(id: {XEX: 123, OAF: 'today'})
+      # "{'3'.XEX.'123'}AND{'3'.OAF.'today'}"
     ```
 
     - Also accepts a string in the standard QuickBase query format
@@ -159,7 +168,7 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
     ```
 
   * **#update_attributes(attributes_hash)**
-    - ** IMPORTANT: Updates *and* saves the object with the new attributes**
+    - **IMPORTANT: Updates *and* saves the object with the new attributes**
     - Returns the object
     ```
       @post = Post.where(author: 'Cullen Jett').first
@@ -175,6 +184,9 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
       @post.assign_attributes(author: 'Socrates', content: 'Something enlightening...')
       @post.save
     ```
+
+  * **.qb_client and #qb_client**
+    - Access the quickbase API client (advantage_quickbase gem) directly
 
 ## Testing
 Unfortunately you will not be able to run the test suite unless you have access to the QuickBase application used as the test database *or* you create your own QuickBase app to test against that mimics the test fakes. Eventually the test calls will be stubbed out so anyone can test it, but I've got stuff to do -- pull requests are welcome :)

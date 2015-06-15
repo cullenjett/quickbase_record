@@ -159,19 +159,24 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(TeacherFake.build_query(hash)).to eq("{'3'.EX.'1'}OR{'3'.EX.'2'}")
     end
 
-    it "accepts custom comparitors via a nested hash" do
+    it "accepts custom comparators via a nested hash" do
       hash = {id: {XEX: 1}}
       expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'1'}")
     end
 
-    it "combines custom comparitors using arrays with OR" do
+    it "combines custom comparators using arrays with OR" do
       hash = {id: {XEX: [1, 2]}}
       expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'1'}OR{'3'.XEX.'2'}")
     end
 
-    it "combines different comparitors with OR" do
-      hash = {id: [{XEX: '123'}, {OAF: 'today'}]}
+    it "combines different comparators with OR" do
+      hash = {id: [{XEX: 123}, {OAF: 'today'}]}
       expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'123'}OR{'3'.OAF.'today'}")
+    end
+
+    it "combines different comparators with AND" do
+      hash = {id: {XEX: 123, OAF: 'today'}}
+      expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'123'}AND{'3'.OAF.'today'}")
     end
 
     it "converts field names to FIDs" do

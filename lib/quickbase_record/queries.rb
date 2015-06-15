@@ -75,30 +75,28 @@ module QuickbaseRecord
         end
       end
 
-      def join_with_and(fid, value, comparitor="EX")
-        "{'#{fid}'.#{comparitor}.'#{value}'}"
+      def join_with_and(fid, value, comparator="EX")
+        "{'#{fid}'.#{comparator}.'#{value}'}"
       end
 
-      def join_with_or(fid, array, comparitor="EX")
+      def join_with_or(fid, array, comparator="EX")
         array.map do |value|
           if value.is_a? Hash
             join_with_custom(fid, value)
           else
-            "{'#{fid}'.#{comparitor}.'#{value}'}"
+            "{'#{fid}'.#{comparator}.'#{value}'}"
           end
         end.join("OR")
       end
 
       def join_with_custom(fid, hash)
-        comparitor = hash.keys.first
-        value = hash.values.first
-
-        if value.is_a? Array
-          join_with_or(fid, value, comparitor)
-        else
-          "{'#{fid}'.#{comparitor}.'#{value}'}"
-        end
-
+        hash.map do |comparator, value|
+          if value.is_a? Array
+            join_with_or(fid, value, comparator)
+          else
+            "{'#{fid}'.#{comparator}.'#{value}'}"
+          end
+        end.join('AND')
       end
 
       def convert_field_name_to_fid(field_name)
