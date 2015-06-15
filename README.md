@@ -114,8 +114,11 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
     - Values in an array are joined with 'OR'
     ```
-      Post.where(author: ['Cullen Jett', 'Socrates')
-      # {'8'.EX.'Socrates'}OR{'8'.EX.'Socrates'}
+      Post.where(author: ['Cullen Jett', 'Socrates'])
+      # {'8'.EX.'Cullen Jett'}OR{'8'.EX.'Socrates'}
+
+      Post.where({ [author: 'Cullen Jett', id: 123] })
+      # {'8'.EX.'Cullen Jett'}OR{'3'.EX.'123'}
     ```
 
     - To use a comparator other than 'EX' pass the value as another hash with the key as the comparator

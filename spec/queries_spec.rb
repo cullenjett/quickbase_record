@@ -159,6 +159,11 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(TeacherFake.build_query(hash)).to eq("{'3'.EX.'1'}OR{'3'.EX.'2'}")
     end
 
+    it "combines an all array query with OR" do
+      hash = [{id: 1, name: 'Cullen Jett'}]
+      expect(TeacherFake.build_query(hash)).to eq("{'3'.EX.'1'}OR{'6'.EX.'Cullen Jett'}")
+    end
+
     it "accepts custom comparators via a nested hash" do
       hash = {id: {XEX: 1}}
       expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'1'}")

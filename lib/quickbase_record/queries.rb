@@ -55,6 +55,13 @@ module QuickbaseRecord
         return convert_query_string(query_hash) if query_hash.is_a? String
 
         query_hash.map do |field_name, values|
+          if field_name.is_a? Hash
+            return field_name.map do |field_name, value|
+              fid = convert_field_name_to_fid(field_name)
+              join_with_or(fid, [value])
+            end.join('OR')
+          end
+
           fid = convert_field_name_to_fid(field_name)
           if values.is_a? Array
             join_with_or(fid, values)
