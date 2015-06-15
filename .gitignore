@@ -12,3 +12,4 @@
 *.o
 *.a
 mkmf.log
+/spec/quickbase_record_config
