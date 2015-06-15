@@ -169,6 +169,11 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'1'}OR{'3'.XEX.'2'}")
     end
 
+    it "combines different comparitors with OR" do
+      hash = {id: [{XEX: '123'}, {OAF: 'today'}]}
+      expect(TeacherFake.build_query(hash)).to eq("{'3'.XEX.'123'}OR{'3'.OAF.'today'}")
+    end
+
     it "converts field names to FIDs" do
       hash = "{name.EX.'Cullen Jett'}"
       expect(TeacherFake.build_query(hash)).to eq("{6.EX.'Cullen Jett'}")

@@ -13,3 +13,4 @@
 *.a
 mkmf.log
 /spec/quickbase_record_config
+.DS_Store

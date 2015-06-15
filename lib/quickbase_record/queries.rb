@@ -81,7 +81,11 @@ module QuickbaseRecord
 
       def join_with_or(fid, array, comparitor="EX")
         array.map do |value|
-          "{'#{fid}'.#{comparitor}.'#{value}'}"
+          if value.is_a? Hash
+            join_with_custom(fid, value)
+          else
+            "{'#{fid}'.#{comparitor}.'#{value}'}"
+          end
         end.join("OR")
       end
 
