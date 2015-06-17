@@ -86,6 +86,14 @@ RSpec.describe QuickbaseRecord::Queries do
       cullen.subject = 'Ruby on Rails'
       cullen.name = "THE #{cullen.name}"
       expect(cullen.save.id).to be_truthy
+    end
+
+    it "uploads files" do
+      cullen = TeacherFake.where(name: 'THE Cullen Jett').first
+      cullen.attachment = {name: 'Test Attachment', file: 'LICENSE.txt'}
+      cullen.save
+      cullen = TeacherFake.find(cullen.id)
+      expect(cullen.attachment[:filename]).to eq('Test Attachment')
       cullen.delete
     end
   end

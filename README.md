@@ -53,6 +53,7 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
     # code...
   end
 ```
+
 **IMPORTANT:** You must supply a key/value pair for :dbid and :id (QuickbaseRecord uses :id instead of :record_id to look more like standard ActiveRecord models)
 
 ### What You Get
@@ -190,6 +191,15 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
   * **.qb_client and #qb_client**
     - Access the quickbase API client (advantage_quickbase gem) directly
+
+## File Attachments
+When ***creating*** an object with a field of type 'file attachment', you must assign it as hash with :name and :file as keys.
+After the object is ***saved*** that field will then become a new hash with :filename and :url as keys.
+```
+  @post = Post.new(attachment: {name: 'Test File Name', file: 'path/to/your/file OR file contents'})
+  @post.save
+  @post.attachment => {filename: 'Test File Name', url: 'https://realm.quickbase.com/up/abcdefg/Test%20File%20Name'}
+```
 
 ## Testing
 Unfortunately you will not be able to run the test suite unless you have access to the QuickBase application used as the test database *or* you create your own QuickBase app to test against that mimics the test fakes. Eventually the test calls will be stubbed out so anyone can test it, but I've got stuff to do -- pull requests are welcome :)

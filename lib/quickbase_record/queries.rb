@@ -153,9 +153,19 @@ module QuickbaseRecord
       current_object = {}
       self.class.fields.each do |field_name, fid|
         current_object[fid] = public_send(field_name) unless UNWRITABLE_FIELDS.include?(field_name.to_s)
-        current_object[self.class.fields[:id]] = self.id if self.id
       end
-      self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
+
+      if has_file_attachment?(current_object)
+        if self.id
+          qb_client.edit_record(self.class.dbid, self.id, current_object)
+        else
+          self.id = qb_client.add_record(self.class.dbid, current_object)
+        end
+      else
+        current_object[self.class.fields[:id]] = self.id if self.id
+        self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
+      end
+
       return self
     end
 
@@ -170,6 +180,12 @@ module QuickbaseRecord
       self.assign_attributes(attributes)
       self.save
       return self
+    end
+
+    private
+
+    def has_file_attachment?(current_object)
+      current_object.values.any? { |value| value.is_a? Hash }
     end
   end
 end

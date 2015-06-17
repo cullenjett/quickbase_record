@@ -1,5 +1,8 @@
+require 'yaml'
+creds = YAML.load_file("spec/config.yml")
+
 QuickbaseRecord.configure do |config|
   config.realm = "ais"
-  config.username = ENV["QB_USERNAME"]
-  config.password = ENV["QB_PASSWORD"]
+  config.username = creds["username"]
+  config.password = creds["password"]
 end

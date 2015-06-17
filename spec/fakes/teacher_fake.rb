@@ -8,6 +8,7 @@ class TeacherFake
     :id => 3,
     :name => 6,
     :subject => 7,
-    :salary => 8
+    :salary => 8,
+    :attachment => 9
   })
 end
