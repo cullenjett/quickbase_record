@@ -25,8 +25,6 @@ module QuickbaseRecord
     def initialize(attributes={})
       create_attr_accesssors
       assign_attributes(attributes) if attributes
-
-      super()
     end
 
     def persisted?
