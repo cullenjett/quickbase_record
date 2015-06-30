@@ -32,7 +32,7 @@ module QuickbaseRecord
     end
 
     def create_attr_accesssors
-      self.class.fields.each do |field_name, fid|
+      self.class.fields.each do |field_name, value|
         self.class.send(:attr_accessor, field_name)
       end
     end

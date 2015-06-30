@@ -5,7 +5,7 @@ module QuickbaseRecord
     extend ActiveSupport::Concern
     include QuickbaseRecord::Client
 
-    UNWRITABLE_FIELDS = ['dbid', 'id', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
+    UNWRITABLE_FIELDS = ['dbid', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
 
     module ClassMethods
       def dbid
@@ -32,7 +32,7 @@ module QuickbaseRecord
 
         return [] if query_response.first.nil?
 
-        build_array_of_new_objects(query_response)
+        build_collection(query_response)
       end
 
       def create(attributes={})
@@ -48,7 +48,7 @@ module QuickbaseRecord
 
         return [] if query_response.first.nil?
 
-        build_array_of_new_objects(query_response)
+        build_collection(query_response)
       end
 
       def build_query(query_hash)
@@ -75,7 +75,7 @@ module QuickbaseRecord
 
       private
 
-      def build_array_of_new_objects(query_response)
+      def build_collection(query_response)
         query_response.map do |response|
           converted_response = convert_quickbase_response(response)
           new(converted_response)
@@ -141,7 +141,7 @@ module QuickbaseRecord
         end
 
         if !match_found
-          raise ArgumentError, "Invalid arguments on #{self}.query() - no matching field name found. \nMake sure the field is part of your class configuration."
+          raise ArgumentError, "Invalid arguments on #{self}.where() - no matching field name found. \nMake sure the field is part of your class configuration."
         end
 
         return query_string
@@ -170,7 +170,7 @@ module QuickbaseRecord
     end
 
     def delete
-      return false if !self.id
+      return false unless self.id
       successful = qb_client.delete_record(self.class.dbid, self.id)
       return successful ? self.id : false
     end
@@ -183,6 +183,15 @@ module QuickbaseRecord
     end
 
     private
+
+    # def send_request(args={})
+    #   dbid = self.class.dbid
+    #   id = self.id
+    #   api_call = args[:api_call]
+    #   data = args[:data]
+
+    #   qb_client.send(api_call, data)
+    # end
 
     def has_file_attachment?(current_object)
       current_object.values.any? { |value| value.is_a? Hash }
