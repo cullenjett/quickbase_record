@@ -183,15 +183,6 @@ module QuickbaseRecord
 
     private
 
-    # def send_request(args={})
-    #   dbid = self.class.dbid
-    #   id = self.id
-    #   api_call = args[:api_call]
-    #   data = args[:data]
-
-    #   qb_client.send(api_call, data)
-    # end
-
     def has_file_attachment?(current_object)
       current_object.values.any? { |value| value.is_a? Hash }
     end
