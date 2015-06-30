@@ -51,10 +51,6 @@ RSpec.describe QuickbaseRecord::Queries do
       expect(teacher.id).to be > 1
       teacher.delete
     end
-
-    it "throws an error if an :id argument is passed" do
-      expect { TeacherFake.create(id: 1, name: 'Professor Dumbledore') }.to raise_error
-    end
   end
 
   describe '.qid' do

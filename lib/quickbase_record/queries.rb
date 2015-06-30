@@ -36,7 +36,6 @@ module QuickbaseRecord
       end
 
       def create(attributes={})
-        raise StandardErrror, "You cannot call #{self}.create() with an :id attribute" if attributes.include?(:id)
         object = new(attributes)
         object.save
         return object
