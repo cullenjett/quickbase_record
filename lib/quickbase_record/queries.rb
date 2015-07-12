@@ -5,7 +5,7 @@ module QuickbaseRecord
     extend ActiveSupport::Concern
     include QuickbaseRecord::Client
 
-    UNWRITABLE_FIELDS = ['dbid', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
+    UNWRITABLE_FIELDS = ['dbid', 'id', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
 
     module ClassMethods
       def dbid
@@ -71,8 +71,6 @@ module QuickbaseRecord
           end
         end.join("AND")
       end
-
-      private
 
       def build_collection(query_response)
         query_response.map do |response|
@@ -177,11 +175,15 @@ module QuickbaseRecord
     def update_attributes(attributes={})
       return false if attributes.blank?
       self.assign_attributes(attributes)
-      self.save
+      updated_attributes = {}
+      attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
+      if self.id
+        qb_client.edit_record(self.class.dbid, self.id, updated_attributes)
+      else
+        self.id = qb_client.add_record(self.class.dbid, updated_attributes)
+      end
       return self
     end
-
-    private
 
     def has_file_attachment?(current_object)
       current_object.values.any? { |value| value.is_a? Hash }

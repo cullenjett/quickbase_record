@@ -15,14 +15,14 @@ RSpec.describe QuickbaseRecord::Model do
     end
 
     # it "formats fields as dates given a hash value" do
-      # StudentFake.define_fields ({
-      #   :dbid => 'bjzrx8ckw',
-      #   :date_created => {date: 1},
-      #   :id => 3,
-      #   :name => 6,
-      #   :grade => 7,
-      #   :email => 8
-      # })
+    #   StudentFake.define_fields ({
+    #     :dbid => 'bjzrx8ckw',
+    #     :date_created => {date: 1},
+    #     :id => 3,
+    #     :name => 6,
+    #     :grade => 7,
+    #     :email => 8
+    #   })
 
     #   puts StudentFake.find(1).inspect
 
@@ -39,10 +39,6 @@ RSpec.describe QuickbaseRecord::Model do
 
     it "assigns passed in attributes to itself" do
       student = StudentFake.new(name: 'Cullen Jett')
-      student.qb_client
-      student.qb_client.ticket = "123"
-      StudentFake.find(1)
-      puts student.qb_client.ticket
       expect(student.name).to eq('Cullen Jett')
     end
   end

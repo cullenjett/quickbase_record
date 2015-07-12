@@ -123,7 +123,7 @@ RSpec.describe QuickbaseRecord::Queries do
   end
 
   describe '#update_attributes' do
-    it "assigns an objects attributes given a hash attributes and their values" do
+    it "assigns an objects attributes given a hash of attributes" do
       teacher = TeacherFake.new(name: 'teacher1', salary: 35000)
       teacher.update_attributes(name: 'teacher2', salary: 40000)
       expect(teacher.name).to eq('teacher2')
