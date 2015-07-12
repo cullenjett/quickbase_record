@@ -152,6 +152,8 @@ module QuickbaseRecord
         current_object[fid] = public_send(field_name) unless UNWRITABLE_FIELDS.include?(field_name.to_s)
       end
 
+      current_object.delete_if { |key, value| value.nil? }
+
       if has_file_attachment?(current_object)
         if self.id
           qb_client.edit_record(self.class.dbid, self.id, current_object)
@@ -177,6 +179,7 @@ module QuickbaseRecord
       self.assign_attributes(attributes)
       updated_attributes = {}
       attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
+      updated_attributes.delete_if { |key, value| value.nil? }
       if self.id
         qb_client.edit_record(self.class.dbid, self.id, updated_attributes)
       else
