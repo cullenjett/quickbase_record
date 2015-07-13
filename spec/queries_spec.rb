@@ -48,7 +48,7 @@ RSpec.describe QuickbaseRecord::Queries do
   describe '.create' do
     it "saves the object immediately" do
       teacher = TeacherFake.create(name: 'Professor Dumbledore')
-      expect(teacher.id).to be > 1
+      expect(teacher.id.to_i).to be > 1
       teacher.delete
     end
   end
