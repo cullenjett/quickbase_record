@@ -140,8 +140,13 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
     - Also accepts a string in the standard QuickBase query format
       * Works with field names or FIDs
     ```
-      Post.query("{'3'.EX.'1'}")
-      Post.query("{author.XEX.'Cullen Jett'}")
+      Post.where("{'3'.EX.'1'}")
+      Post.where("{author.XEX.'Cullen Jett'}")
+    ```
+
+    - To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
+    ```
+      Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author'})
     ```
 
   * **.qid(id)**
@@ -154,7 +159,6 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
   * **#save**
     - Creates a new record in QuickBase for objects that don't have an ID *or* edits the corresponding QuickBase record if the object already has an ID
     - Returns the object (if #save created a record in QuickBase the the returned object will now have an ID)
-    - Uses API_ImportFromCSV under the hood.
     ```
       @post = Post.new(content: 'Amazing post content', author: 'Cullen Jett')
       @post.save # => <Post: @id: 1, @content: 'Amazing post content', @author: 'Cullen Jett'
@@ -173,6 +177,7 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
   * **#update_attributes(attributes_hash)**
     - **IMPORTANT: Updates *and* saves the object with the new attributes**
+    - Only sends the passed in attributes as arguments to API_AddRecord or API_EditRecord (depending on whether the object has an ID or not)
     - Returns the object
     ```
       @post = Post.where(author: 'Cullen Jett').first
