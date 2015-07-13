@@ -42,7 +42,7 @@ module QuickbaseRecord
         build_collection(query_response)
       end
 
-      def create(attributes={})
+      def create(attributes = {})
         object = new(attributes)
         object.save
         return object
