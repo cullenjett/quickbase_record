@@ -16,9 +16,10 @@ module QuickbaseRecord
         @clist ||= fields.reject{ |field_name| field_name == :dbid }.values.join('.')
       end
 
-      def find(id)
-        query_options = { query: build_query(id: id), clist: clist }
-        query_response = qb_client.do_query(dbid, query_options).first
+      def find(id, query_options = {})
+        query_options = build_query_options(query_options[:query_options])
+        query = { query: build_query(id: id), clist: clist }.merge(query_options)
+        query_response = qb_client.do_query(dbid, query).first
 
         return nil if query_response.nil?
 
@@ -27,8 +28,14 @@ module QuickbaseRecord
       end
 
       def where(query_hash)
-        query_options = { query: build_query(query_hash), clist: clist }
-        query_response = qb_client.do_query(dbid, query_options)
+        if !query_hash.is_a? String
+          options = build_query_options(query_hash.delete(:query_options))
+        else
+          options = {}
+        end
+
+        query = { query: build_query(query_hash), clist: clist }.merge(options)
+        query_response = qb_client.do_query(dbid, query)
 
         return [] if query_response.first.nil?
 
@@ -42,8 +49,8 @@ module QuickbaseRecord
       end
 
       def qid(id)
-        query_options = { qid: id, clist: clist }
-        query_response = qb_client.do_query(dbid, query_options)
+        query = { qid: id, clist: clist }
+        query_response = qb_client.do_query(dbid, query)
 
         return [] if query_response.first.nil?
 
@@ -70,6 +77,22 @@ module QuickbaseRecord
             join_with_and(fid, values)
           end
         end.join("AND")
+      end
+
+      def build_query_options(options)
+        return {} unless options
+
+        result = {}
+
+        options.each do |option_name, value|
+          if option_name.to_sym == :options
+            result[option_name] = value
+          else
+            result[option_name] = convert_field_name_to_fid(value)
+          end
+        end
+
+        return result
       end
 
       def build_collection(query_response)

@@ -16,6 +16,11 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher = TeacherFake.find(999999)
       expect(teacher).to eq(nil)
     end
+
+    it "accepts query options" do
+      teacher = TeacherFake.find(1, query_options: {clist: 'id'})
+      expect(teacher.name).to be_nil
+    end
   end
 
   describe '.where' do
@@ -42,6 +47,11 @@ RSpec.describe QuickbaseRecord::Queries do
     it "returns an empty array if no QuickBase records are found" do
       teachers = TeacherFake.where(name: 'Not a real TeacherFake name...')
       expect(teachers).to eq([])
+    end
+
+    it "accepts query options" do
+      teachers = TeacherFake.where(subject: ['Gym', 'Biology'], query_options: {slist: 'subject', options: 'sortorder-D'})
+      expect(teachers.first.subject).to eq('Gym')
     end
   end
 
