@@ -177,16 +177,11 @@ module QuickbaseRecord
 
       current_object.delete_if { |key, value| value.nil? }
 
-      # if has_file_attachment?(current_object)
-        if self.id
-          qb_client.edit_record(self.class.dbid, self.id, current_object)
-        else
-          self.id = qb_client.add_record(self.class.dbid, current_object)
-        end
-      # else
-      #   current_object[self.class.fields[:id]] = self.id if self.id
-      #   self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
-      # end
+      if self.id
+        qb_client.edit_record(self.class.dbid, self.id, current_object)
+      else
+        self.id = qb_client.add_record(self.class.dbid, current_object)
+      end
 
       return self
     end
@@ -209,10 +204,6 @@ module QuickbaseRecord
         self.id = qb_client.add_record(self.class.dbid, updated_attributes)
       end
       return self
-    end
-
-    def has_file_attachment?(current_object)
-      current_object.values.any? { |value| value.is_a? Hash }
     end
   end
 end
