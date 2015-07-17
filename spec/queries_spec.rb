@@ -53,6 +53,12 @@ RSpec.describe QuickbaseRecord::Queries do
       teachers = TeacherFake.where(subject: ['Gym', 'Biology'], query_options: {slist: 'subject', options: 'sortorder-D'})
       expect(teachers.first.subject).to eq('Gym')
     end
+
+    it "accepts modified clists" do
+      teachers = TeacherFake.where(id: {XEX: ''}, query_options: {clist: 'id'})
+      expect(teachers.first.id).to be_present
+      expect(teachers.first.subject).not_to be_present
+    end
   end
 
   describe '.create' do

@@ -34,6 +34,8 @@ module QuickbaseRecord
           options = {}
         end
 
+        clist = options.delete(:clist) if options[:clist]
+
         query = { query: build_query(query_hash), clist: clist }.merge(options)
         query_response = qb_client.do_query(dbid, query)
 
