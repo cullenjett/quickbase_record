@@ -90,8 +90,15 @@ module QuickbaseRecord
         options.each do |option_name, value|
           if option_name.to_sym == :options
             result[option_name] = value
-          else
-            result[option_name] = convert_field_name_to_fid(value)
+            next
+          end
+
+          value.split('.').each do |value|
+            if result[option_name]
+              result[option_name] << ".#{convert_field_name_to_fid(value)}"
+            else
+              result[option_name] = convert_field_name_to_fid(value)
+            end
           end
         end
 

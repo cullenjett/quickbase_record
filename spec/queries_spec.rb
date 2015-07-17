@@ -55,7 +55,7 @@ RSpec.describe QuickbaseRecord::Queries do
     end
 
     it "accepts modified clists" do
-      teachers = TeacherFake.where(id: {XEX: ''}, query_options: {clist: 'id'})
+      teachers = TeacherFake.where(id: {XEX: ''}, query_options: {clist: 'id.salary'})
       expect(teachers.first.id).to be_present
       expect(teachers.first.subject).not_to be_present
     end
@@ -212,6 +212,23 @@ RSpec.describe QuickbaseRecord::Queries do
     it "throws an error for invaid field names" do
       hash = "{not_a_field_name.EX.'Cullen Jett'}"
       expect { TeacherFake.build_query(hash) }.to raise_error
+    end
+  end
+
+  describe '.build_query_options' do
+    it "returns a hash" do
+      options = {clist: '1.2.3'}
+      expect(TeacherFake.build_query_options(options)).to be_a Hash
+    end
+
+    it "converts field names to FIDs" do
+      options = {clist: 'name'}
+      expect(TeacherFake.build_query_options(options)).to eq({clist: '6'})
+    end
+
+    it "splits clist and slist on '.'" do
+      options = {clist: 'name.subject', slist: 'name.salary'}
+      expect(TeacherFake.build_query_options(options)).to eq({clist: '6.7', slist: '6.8'})
     end
   end
 end
