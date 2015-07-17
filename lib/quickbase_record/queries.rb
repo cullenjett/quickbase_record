@@ -18,6 +18,7 @@ module QuickbaseRecord
 
       def find(id, query_options = {})
         query_options = build_query_options(query_options[:query_options])
+        clist = query_options.delete(:clist) if query_options[:clist]
         query = { query: build_query(id: id), clist: clist }.merge(query_options)
         query_response = qb_client.do_query(dbid, query).first
 
