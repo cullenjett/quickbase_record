@@ -54,7 +54,7 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
   end
 ```
 
-**IMPORTANT:** You must supply a key/value pair for :dbid and :id (QuickbaseRecord uses :id instead of :record_id to look more like standard ActiveRecord models)
+**IMPORTANT:** You must supply a key/value pair for :dbid and :id (QuickbaseRecord uses :id instead of :record_id to look more like standard ActiveRecord models). If your table does not use [Record ID] as it's primary key then you must supply a key/value pair for :record_id and assign :id to the primary key.
 
 ### What You Get
 Classes that include QuickbaseRecord::Model and define their fields will have a handful of class and instance methods for interacting with your QuickBase application similar to ActiveRecord. The goal is to be able to use QuickBase as a database and treat your models the same way you would with a traditional database.
@@ -169,7 +169,7 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
   * **#delete**
     - Delete the corresponding record in QuickBase
-    - It returns the object's ID if successful or `false` if unsuccessful
+    - It returns the object if successful or `false` if unsuccessful
     ```
       @post = Post.find(1)
       @post.delete

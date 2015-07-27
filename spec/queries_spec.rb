@@ -1,4 +1,5 @@
 require './spec/fakes/teacher_fake'
+require './spec/fakes/classroom_fake'
 
 RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
@@ -82,44 +83,80 @@ RSpec.describe QuickbaseRecord::Queries do
   end
 
   describe '#save' do
-    it "creates a new record in QuickBase for an object without an ID and sets it's new ID" do
-      cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
-      cullen.save
-      expect(cullen.id).to be_truthy
+    context "when record ID is the primary key" do
+      it "creates a new record in QuickBase for an object without an ID and sets it's new ID" do
+        cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
+        cullen.save
+        expect(cullen.id).to be_truthy
+      end
+
+      it "returns the object on successful save" do
+        cullen = TeacherFake.where(name: 'Cullen Jett').first
+        expect(cullen.save).to be_a TeacherFake
+      end
+
+      it "edits an object that has an existing ID" do
+        cullen = TeacherFake.where(name: 'Cullen Jett').first
+        cullen.subject = 'Ruby on Rails'
+        cullen.name = "THE #{cullen.name}"
+        expect(cullen.save.id).to be_truthy
+      end
+
+      it "uploads files" do
+        cullen = TeacherFake.where(name: 'THE Cullen Jett').first
+        cullen.attachment = {name: 'Test Attachment', file: 'LICENSE.txt'}
+        cullen.save
+        cullen = TeacherFake.find(cullen.id)
+        expect(cullen.attachment[:filename]).to eq('Test Attachment')
+        cullen.delete
+      end
     end
 
-    it "returns the object on successful save" do
-      cullen = TeacherFake.where(name: 'Cullen Jett').first
-      expect(cullen.save).to be_a TeacherFake
-    end
+    context "when record ID is not the primary key" do
+      it "creates a new record if the object doesn't have a record ID" do
+        math = ClassroomFake.new(id: '1', subject: 'Math')
+        math.save
+        expect(ClassroomFake.find('1')).not_to be_nil
+        math.delete
+      end
 
-    it "edits an object that has an existing ID" do
-      cullen = TeacherFake.where(name: 'Cullen Jett').first
-      cullen.subject = 'Ruby on Rails'
-      cullen.name = "THE #{cullen.name}"
-      expect(cullen.save.id).to be_truthy
-    end
+      it "sets the object's record id for new records" do
+        english = ClassroomFake.new(id: '2', subject: 'English', date_created: 'this should not save')
+        english.save
+        expect(english.record_id).to be_present
+        expect(english.record_id).not_to eq('2')
+        english.delete
+      end
 
-    it "uploads files" do
-      cullen = TeacherFake.where(name: 'THE Cullen Jett').first
-      cullen.attachment = {name: 'Test Attachment', file: 'LICENSE.txt'}
-      cullen.save
-      cullen = TeacherFake.find(cullen.id)
-      expect(cullen.attachment[:filename]).to eq('Test Attachment')
-      cullen.delete
+      it "edits a record if it has a record ID" do
+        science = ClassroomFake.find(101)
+        science.subject = 'SCIENCE!'
+        science.save
+        expect(science.subject).to eq('SCIENCE!')
+        science.update_attributes(subject: 'Science')
+      end
     end
   end
 
   describe '#delete' do
-    it "deletes an object from QuickBase" do
-      socrates = TeacherFake.new(name: 'Socrates')
-      socrates.save
-      old_id = socrates.id
-      expect(socrates.delete).to eq(old_id)
+    context "when record ID is the primary key" do
+      it "deletes an object from QuickBase" do
+        socrates = TeacherFake.new(name: 'Socrates')
+        socrates.save
+        expect(socrates.delete).to eq(socrates)
+      end
+
+      it "returns false if the object doesn't yet have an ID" do
+        expect(TeacherFake.new(name: 'Socrates').delete).to be false
+      end
     end
 
-    it "returns false if the object doesn't yet have an ID" do
-      expect(TeacherFake.new(name: 'Socrates').delete).to be false
+    context "when record ID is not the primary key" do
+      it "deletes the record from QuickBase" do
+        gym = ClassroomFake.new(id: '3', subject: 'Gym')
+        gym.save
+        expect(gym.delete).to eq(gym)
+      end
     end
   end
 

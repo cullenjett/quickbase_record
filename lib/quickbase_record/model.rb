@@ -13,6 +13,7 @@ module QuickbaseRecord
     end
 
     module ClassMethods
+
       def fields(fields_hash={})
         @fields ||= FieldMapping.new(fields_hash).fields
       end

@@ -13,21 +13,6 @@ RSpec.describe QuickbaseRecord::Model do
 
       expect(StudentFake.fields[:id]).to eq(3)
     end
-
-    # it "formats fields as dates given a hash value" do
-    #   StudentFake.define_fields ({
-    #     :dbid => 'bjzrx8ckw',
-    #     :date_created => {date: 1},
-    #     :id => 3,
-    #     :name => 6,
-    #     :grade => 7,
-    #     :email => 8
-    #   })
-
-    #   puts StudentFake.find(1).inspect
-
-    #   expect(StudentFake.find(1).date_created).to eq('1/1/2015')
-    # end
   end
 
   describe 'initialize' do
