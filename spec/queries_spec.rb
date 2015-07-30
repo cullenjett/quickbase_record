@@ -5,7 +5,7 @@ RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
     it "finds a single Teacher given an ID" do
       teacher = TeacherFake.find(1)
-      expect(teacher.id).to eq("1")
+      expect(teacher.id).to eq(1)
     end
 
     it "returns an object of the Teacher class" do
@@ -37,12 +37,12 @@ RSpec.describe QuickbaseRecord::Queries do
 
     it "accepts a string in QuickBase query format" do
       teachers = TeacherFake.where("{'3'.EX.'1'}")
-      expect(teachers.first.id).to eq('1')
+      expect(teachers.first.id).to eq(1)
     end
 
     it "accepts a string in QuickBase query format using field names" do
       teachers = TeacherFake.where("{'id'.EX.'1'}")
-      expect(teachers.first.id).to eq('1')
+      expect(teachers.first.id).to eq(1)
     end
 
     it "returns an empty array if no QuickBase records are found" do
@@ -114,17 +114,17 @@ RSpec.describe QuickbaseRecord::Queries do
 
     context "when record ID is not the primary key" do
       it "creates a new record if the object doesn't have a record ID" do
-        math = ClassroomFake.new(id: '1', subject: 'Math')
+        math = ClassroomFake.new(id: 1, subject: 'Math')
         math.save
-        expect(ClassroomFake.find('1')).not_to be_nil
+        expect(ClassroomFake.find(1)).not_to be_nil
         math.delete
       end
 
       it "sets the object's record id for new records" do
-        english = ClassroomFake.new(id: '2', subject: 'English', date_created: 'this should not save')
+        english = ClassroomFake.new(id: 2, subject: 'English', date_created: 'this should not save')
         english.save
         expect(english.record_id).to be_present
-        expect(english.record_id).not_to eq('2')
+        expect(english.record_id).not_to eq(2)
         english.delete
       end
 
@@ -153,7 +153,7 @@ RSpec.describe QuickbaseRecord::Queries do
 
     context "when record ID is not the primary key" do
       it "deletes the record from QuickBase" do
-        gym = ClassroomFake.new(id: '3', subject: 'Gym')
+        gym = ClassroomFake.new(id: 3, subject: 'Gym')
         gym.save
         expect(gym.delete).to eq(gym)
       end

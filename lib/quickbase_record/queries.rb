@@ -157,7 +157,10 @@ module QuickbaseRecord
         result = {}
 
         response.each do |fid, value|
-          field_name = covert_fid_to_field_name(fid)
+          field = fields.select { |field_name, field| field.fid == fid.to_i }.values.first
+          field_name = field.field_name
+          value = field.convert(value)
+          # field_name = covert_fid_to_field_name(fid)
           result[field_name] = value
         end
 
