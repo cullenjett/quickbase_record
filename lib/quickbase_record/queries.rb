@@ -77,7 +77,28 @@ module QuickbaseRecord
         end.join("AND")
       end
 
-      private
+      def build_query_options(options)
+        return {} unless options
+
+        result = {}
+
+        options.each do |option_name, value|
+          if option_name.to_sym == :options
+            result[option_name] = value
+            next
+          end
+
+          value.split('.').each do |value|
+            if result[option_name]
+              result[option_name] << ".#{convert_field_name_to_fid(value)}"
+            else
+              result[option_name] = convert_field_name_to_fid(value)
+            end
+          end
+        end
+
+        return result
+      end
 
       def build_array_of_new_objects(query_response)
         query_response.map do |response|
