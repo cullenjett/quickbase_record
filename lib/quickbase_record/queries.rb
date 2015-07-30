@@ -100,6 +100,13 @@ module QuickbaseRecord
         return result
       end
 
+      def build_collection(query_response)
+        query_response.map do |response|
+          converted_response = convert_quickbase_response(response)
+          new(converted_response)
+        end
+      end
+
       def build_array_of_new_objects(query_response)
         query_response.map do |response|
           converted_response = convert_quickbase_response(response)
@@ -134,6 +141,8 @@ module QuickbaseRecord
       end
 
       def covert_fid_to_field_name(fid)
+        puts "FID: #{fid}"
+        puts "FIELDS: #{fields.inspect}"
         fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
       end
 
