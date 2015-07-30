@@ -21,6 +21,7 @@ module QuickbaseRecord
         table_definition = TableDefinition.new
         yield table_definition
         @dbid = table_definition.fields[:dbid]
+        puts "TABLE DEFINITION: #{table_definition.fields}"
         @fields = table_definition.fields.reject { |field_name, field| field_name == :dbid }
       end
     end

@@ -141,7 +141,7 @@ module QuickbaseRecord
       end
 
       def covert_fid_to_field_name(fid)
-        puts "FID: #{fid}"
+        # puts "FID: #{fid}"
         puts "FIELDS: #{fields.inspect}"
         fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
       end
