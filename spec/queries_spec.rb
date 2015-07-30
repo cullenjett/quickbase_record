@@ -51,7 +51,7 @@ RSpec.describe QuickbaseRecord::Queries do
     end
 
     it "accepts query options" do
-      teachers = TeacherFake.where(subject: ['Gym', 'Biology'], query_options: {slist: 'subject', options: 'sortorder-D'})
+      teachers = TeacherFake.where(subject: ['Biology', 'Gym'], query_options: {slist: 'subject', options: 'sortorder-D'})
       expect(teachers.first.subject).to eq('Gym')
     end
 

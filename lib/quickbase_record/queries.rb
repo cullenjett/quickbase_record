@@ -16,9 +16,13 @@ module QuickbaseRecord
         @clist ||= fields.reject{ |field_name, field| field_name == :dbid }.values.collect {|field| field.fid }.join('.')
       end
 
-      def find(id, query_options = {})
+      def find(id, query_options={})
         query_options = build_query_options(query_options[:query_options])
-        clist = query_options.delete(:clist) if query_options[:clist]
+        if query_options[:clist]
+          clist = query_options.delete(:clist)
+        else
+          clist = self.clist
+        end
         query = { query: build_query(id: id), clist: clist }.merge(query_options)
         query_response = qb_client.do_query(dbid, query).first
 
@@ -35,7 +39,11 @@ module QuickbaseRecord
           options = {}
         end
 
-        clist = options.delete(:clist) if options[:clist]
+        if options[:clist]
+          clist = options.delete(:clist)
+        else
+          clist = self.clist
+        end
 
         query = { query: build_query(query_hash), clist: clist }.merge(options)
         query_response = qb_client.do_query(dbid, query)
@@ -63,7 +71,9 @@ module QuickbaseRecord
       def build_query(query_hash)
         return convert_query_string(query_hash) if query_hash.is_a? String
 
+        puts "FIELDS: #{fields.inspect}"
         query_hash.map do |field_name, values|
+          puts "FIELD NAME: #{field_name}"
           fid = fields[field_name].fid
 
           if values.is_a? Array
@@ -92,7 +102,7 @@ module QuickbaseRecord
             if result[option_name]
               result[option_name] << ".#{convert_field_name_to_fid(value)}"
             else
-              result[option_name] = convert_field_name_to_fid(value)
+              result[option_name] = convert_field_name_to_fid(value).to_s
             end
           end
         end
@@ -141,8 +151,6 @@ module QuickbaseRecord
       end
 
       def covert_fid_to_field_name(fid)
-        # puts "FID: #{fid}"
-        puts "FIELDS: #{fields.inspect}"
         fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
       end
 
