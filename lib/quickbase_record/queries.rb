@@ -5,13 +5,7 @@ module QuickbaseRecord
     extend ActiveSupport::Concern
     include QuickbaseRecord::Client
 
-    UNWRITABLE_FIELDS = ['dbid', 'id', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
-
     module ClassMethods
-      # def dbid
-      #   @dbid ||= fields[:dbid]
-      # end
-
       def clist
         @clist ||= fields.reject{ |field_name, field| field_name == :dbid }.values.collect {|field| field.fid }.join('.')
       end
@@ -71,19 +65,26 @@ module QuickbaseRecord
       def build_query(query_hash)
         return convert_query_string(query_hash) if query_hash.is_a? String
 
-        puts "FIELDS: #{fields.inspect}"
         query_hash.map do |field_name, values|
           puts "FIELD NAME: #{field_name}"
-          fid = fields[field_name].fid
+          puts "VALUES: #{values}"
+          if field_name.is_a? Hash
+            return field_name.map do |field_name, value|
+              fid = convert_field_name_to_fid(field_name)
+              join_with_or(fid, [value])
+            end.join('OR')
+          end
 
+          fid = convert_field_name_to_fid(field_name)
+          puts "FID: #{fid}"
           if values.is_a? Array
+            puts "JOINING WITH OR"
             join_with_or(fid, values)
           elsif values.is_a? Hash
             join_with_custom(fid, values)
           else
             join_with_and(fid, values)
           end
-
         end.join("AND")
       end
 
