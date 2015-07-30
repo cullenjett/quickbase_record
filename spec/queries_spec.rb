@@ -254,7 +254,7 @@ RSpec.describe QuickbaseRecord::Queries do
 
   describe '.build_query_options' do
     it "returns a hash" do
-      options = {clist: '1.2.3'}
+      options = {clist: 'id.salary'}
       expect(TeacherFake.build_query_options(options)).to be_a Hash
     end
 
