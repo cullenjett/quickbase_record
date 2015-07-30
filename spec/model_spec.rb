@@ -4,7 +4,7 @@ RSpec.describe QuickbaseRecord::Model do
   describe '.define_fields' do
     it "sets the class field mappings for field names => FIDs" do
       StudentFake.define_fields do |t|
-        t.string :dbid, "abc123"
+        t.dbid "abc123"
         t.number :id, 3, :primary_key
         t.date :date_created, 4
         t.string :name, 6

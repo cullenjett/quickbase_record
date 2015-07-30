@@ -3,7 +3,6 @@ require 'active_support/all'
 require 'active_model'
 require 'quickbase' # This is the file name for the 'advantage_quickbase' gem. Idk why Ben named it this way...
 require_relative 'quickbase_record/configuration'
-require_relative 'quickbase_record/field_mapping'
 require_relative 'quickbase_record/client'
 require_relative 'quickbase_record/queries'
 require_relative 'quickbase_record/model'
