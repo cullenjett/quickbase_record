@@ -98,9 +98,9 @@ module QuickbaseRecord
 
       end
 
-      # def convert_field_name_to_fid(field_name)
-      #   fields[field_name.to_sym].fid
-      # end
+      def convert_field_name_to_fid(field_name)
+        fields[field_name.to_sym].fid
+      end
 
       def covert_fid_to_field_name(fid)
         fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
@@ -175,8 +175,8 @@ module QuickbaseRecord
 
       self.assign_attributes(attributes)
       updated_attributes = {}
-      attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
-      updated_attributes.delete_if { |key, value| value.nil? }
+      # attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
+      # updated_attributes.delete_if { |key, value| value.nil? }
 
       if self.id
         qb_client.edit_record(self.class.dbid, self.id, updated_attributes)

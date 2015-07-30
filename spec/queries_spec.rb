@@ -1,4 +1,5 @@
 require './spec/fakes/teacher_fake'
+require './spec/fakes/classroom_fake'
 
 RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
