@@ -36,7 +36,6 @@ module QuickbaseRecord
       end
 
       def create(attributes={})
-        raise StandardErrror, "You cannot call #{self}.create() with an :id attribute" if attributes.include?(:id)
         object = new(attributes)
         object.save
         return object
@@ -144,25 +143,54 @@ module QuickbaseRecord
     # INSTANCE METHODS
     def save
       current_object = {}
-      self.class.fields.each do |field_name, fid|
-        current_object[fid] = public_send(field_name) unless UNWRITABLE_FIELDS.include?(field_name.to_s)
-        current_object[self.class.fields[:id]] = self.id if self.id
+      self.class.fields.each do |field_name, field|
+        current_object[field.fid.to_s] = public_send(field_name)
       end
-      self.id = qb_client.import_from_csv(self.class.dbid, [current_object]).first
+
+      if current_object['3'] #object has a record_id, so we'll edit it
+        remove_unwritable_fields(current_object)
+        qb_client.edit_record(self.class.dbid, self.id, current_object)
+      else
+        remove_unwritable_fields(current_object)
+        new_rid = qb_client.add_record(self.class.dbid, current_object)
+        id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
+        public_send("#{id_field_name}=", new_rid)
+      end
+
       return self
     end
 
     def delete
-      return false if !self.id
-      successful = qb_client.delete_record(self.class.dbid, self.id)
-      return successful ? self.id : false
+      # we have to use [record id] because of the advantage_quickbase gem
+      id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
+      rid = public_send(id_field_name)
+      return false unless rid
+
+      successful = qb_client.delete_record(self.class.dbid, rid)
+      return successful ? self : false
     end
 
     def update_attributes(attributes={})
       return false if attributes.blank?
+
       self.assign_attributes(attributes)
-      self.save
+      updated_attributes = {}
+      attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
+      updated_attributes.delete_if { |key, value| value.nil? }
+
+      if self.id
+        qb_client.edit_record(self.class.dbid, self.id, updated_attributes)
+      else
+        self.id = qb_client.add_record(self.class.dbid, updated_attributes)
+      end
+
       return self
+    end
+
+    def remove_unwritable_fields(hash)
+      hash.delete_if do |key, value|
+        value.nil? || key.to_i <= 5 || key == :dbid
+      end
     end
   end
 end
