@@ -66,8 +66,6 @@ module QuickbaseRecord
         return convert_query_string(query_hash) if query_hash.is_a? String
 
         query_hash.map do |field_name, values|
-          puts "FIELD NAME: #{field_name}"
-          puts "VALUES: #{values}"
           if field_name.is_a? Hash
             return field_name.map do |field_name, value|
               fid = convert_field_name_to_fid(field_name)
@@ -76,9 +74,7 @@ module QuickbaseRecord
           end
 
           fid = convert_field_name_to_fid(field_name)
-          puts "FID: #{fid}"
           if values.is_a? Array
-            puts "JOINING WITH OR"
             join_with_or(fid, values)
           elsif values.is_a? Hash
             join_with_custom(fid, values)
@@ -125,26 +121,28 @@ module QuickbaseRecord
         end
       end
 
-      def join_with_and(fid, value, comparitor="EX")
-        "{'#{fid}'.#{comparitor}.'#{value}'}"
+      def join_with_and(fid, value, comparator="EX")
+        "{'#{fid}'.#{comparator}.'#{value}'}"
       end
 
-      def join_with_or(fid, array, comparitor="EX")
+      def join_with_or(fid, array, comparator="EX")
         array.map do |value|
-          "{'#{fid}'.#{comparitor}.'#{value}'}"
+          if value.is_a? Hash
+            join_with_custom(fid, value)
+          else
+            "{'#{fid}'.#{comparator}.'#{value}'}"
+          end
         end.join("OR")
       end
 
       def join_with_custom(fid, hash)
-        comparitor = hash.keys.first
-        value = hash.values.first
-
-        if value.is_a? Array
-          join_with_or(fid, value, comparitor)
-        else
-          "{'#{fid}'.#{comparitor}.'#{value}'}"
-        end
-
+        hash.map do |comparator, value|
+          if value.is_a? Array
+            join_with_or(fid, value, comparator)
+          else
+            "{'#{fid}'.#{comparator}.'#{value}'}"
+          end
+        end.join('AND')
       end
 
       def convert_field_name_to_fid(field_name)
