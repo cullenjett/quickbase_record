@@ -9,5 +9,6 @@ class TeacherFake
     t.string :name, 6
     t.string :subject, 7
     t.number :salary, 8
+    t.file_attachment :attachment, 9
   end
 end

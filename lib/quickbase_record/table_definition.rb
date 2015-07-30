@@ -25,6 +25,13 @@ class TableDefinition
     fields[field_name] = Field.new(field_name: field_name, fid: fid, type: :number, options: options)
   end
 
+  def file_attachment(field_name, fid, options={})
+    field_name = field_name.to_sym
+    fid = fid.to_i
+
+    fields[field_name] = Field.new(field_name: field_name, fid: fid, type: :file_attachment, options: options)
+  end
+
   def date(field_name, fid, options={})
     field_name = field_name.to_sym
     fid = fid.to_i
