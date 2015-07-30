@@ -16,9 +16,11 @@ module QuickbaseRecord
         @clist ||= fields.reject{ |field_name, field| field_name == :dbid }.values.collect {|field| field.fid }.join('.')
       end
 
-      def find(id)
-        query_options = { query: build_query(id: id), clist: clist }
-        query_response = qb_client.do_query(dbid, query_options).first
+      def find(id, query_options = {})
+        query_options = build_query_options(query_options[:query_options])
+        clist = query_options.delete(:clist) if query_options[:clist]
+        query = { query: build_query(id: id), clist: clist }.merge(query_options)
+        query_response = qb_client.do_query(dbid, query).first
 
         return nil if query_response.nil?
 
@@ -27,12 +29,20 @@ module QuickbaseRecord
       end
 
       def where(query_hash)
-        query_options = { query: build_query(query_hash), clist: clist }
-        query_response = qb_client.do_query(dbid, query_options)
+        if !query_hash.is_a? String
+          options = build_query_options(query_hash.delete(:query_options))
+        else
+          options = {}
+        end
+
+        clist = options.delete(:clist) if options[:clist]
+
+        query = { query: build_query(query_hash), clist: clist }.merge(options)
+        query_response = qb_client.do_query(dbid, query)
 
         return [] if query_response.first.nil?
 
-        build_array_of_new_objects(query_response)
+        build_collection(query_response)
       end
 
       def create(attributes={})
