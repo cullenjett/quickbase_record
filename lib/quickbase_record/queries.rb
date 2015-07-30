@@ -8,12 +8,12 @@ module QuickbaseRecord
     UNWRITABLE_FIELDS = ['dbid', 'id', 'date_created', 'date_modified', 'record_owner', 'last_modified_by']
 
     module ClassMethods
-      def dbid
-        @dbid ||= fields[:dbid]
-      end
+      # def dbid
+      #   @dbid ||= fields[:dbid]
+      # end
 
       def clist
-        @clist ||= fields.reject{ |field_name| field_name == :dbid }.values.join('.')
+        @clist ||= fields.reject{ |field_name, field| field_name == :dbid }.values.collect {|field| field.fid }.join('.')
       end
 
       def find(id)
@@ -55,7 +55,8 @@ module QuickbaseRecord
         return convert_query_string(query_hash) if query_hash.is_a? String
 
         query_hash.map do |field_name, values|
-          fid = convert_field_name_to_fid(field_name)
+          fid = fields[field_name].fid
+
           if values.is_a? Array
             join_with_or(fid, values)
           elsif values.is_a? Hash
@@ -63,6 +64,7 @@ module QuickbaseRecord
           else
             join_with_and(fid, values)
           end
+
         end.join("AND")
       end
 
@@ -97,12 +99,12 @@ module QuickbaseRecord
 
       end
 
-      def convert_field_name_to_fid(field_name)
-        self.fields[field_name.to_sym].to_s
-      end
+      # def convert_field_name_to_fid(field_name)
+      #   fields[field_name.to_sym].fid
+      # end
 
       def covert_fid_to_field_name(fid)
-        self.fields.invert[fid.to_i]
+        fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
       end
 
       def convert_quickbase_response(response)
@@ -122,11 +124,11 @@ module QuickbaseRecord
 
         return query_string unless uses_field_name
 
-        fields.each do |field_name, fid|
-          field_name = field_name.to_s
+        fields.each do |field_name, field|
           match_string = "\{'?(#{field_name})'?\..*\.'?.*'?\}"
+
           if query_string.scan(/#{match_string}/).length > 0
-            query_string.gsub!(field_name, fid.to_s)
+            query_string.gsub!(field_name.to_s, field.fid.to_s)
             match_found = true
           end
         end

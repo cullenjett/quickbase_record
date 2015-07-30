@@ -13,6 +13,19 @@ RSpec.describe QuickbaseRecord::Model do
 
       expect(StudentFake.fields[:id]).to eq(3)
     end
+
+    it "accepts data types" do
+      StudentFake.define_fields do |t|
+        t.string :dbid, "abc123"
+        t.number :id, 3, :primary_key
+        t.date :date_created, 4
+        t.string :name, 6
+        t.number :grade, 7, :read_only
+        t.string :email, 8
+      end
+
+      expect(StudentFake.fields[:id].fid).to eq(3)
+    end
   end
 
   describe 'initialize' do

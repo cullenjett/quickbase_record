@@ -4,6 +4,7 @@ RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
     it "finds a single Teacher given an ID" do
       teacher = TeacherFake.find(1)
+      puts teacher.inspect
       expect(teacher.id).to eq("1")
     end
 
