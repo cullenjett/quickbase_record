@@ -3,15 +3,16 @@ require './spec/fakes/student_fake'
 RSpec.describe QuickbaseRecord::Model do
   describe '.define_fields' do
     it "sets the class field mappings for field names => FIDs" do
-      StudentFake.define_fields ({
-        :dbid => 'bjzrx8ckw',
-        :id => 3,
-        :name => 6,
-        :grade => 7,
-        :email => 8
-      })
+      StudentFake.define_fields do |t|
+        t.dbid "abc123"
+        t.number :id, 3, :primary_key, :read_only
+        t.date :date_created, 4
+        t.string :name, 6
+        t.number :grade, 7, :read_only
+        t.string :email, 8
+      end
 
-      expect(StudentFake.fields[:id]).to eq(3)
+      expect(StudentFake.fields[:id].fid).to eq(3)
     end
   end
 
