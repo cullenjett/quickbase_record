@@ -160,7 +160,6 @@ module QuickbaseRecord
           field = fields.select { |field_name, field| field.fid == fid.to_i }.values.first
           field_name = field.field_name
           value = field.convert(value)
-          # field_name = covert_fid_to_field_name(fid)
           result[field_name] = value
         end
 
@@ -191,12 +190,12 @@ module QuickbaseRecord
     end
 
     # INSTANCE METHODS
-    def primary_key_field_name
-      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.keys.first
-    end
-
     def writable_fields
       @writable_fields ||= self.class.fields.reject{ |field_name, field| field.options.include?(:read_only) }
+    end
+
+    def primary_key_field_name
+      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.keys.first
     end
 
     def record_id_field_name
@@ -204,6 +203,7 @@ module QuickbaseRecord
     end
 
     def save
+      primary_key = public_send(primary_key_field_name)
       current_object = {}
       self.class.fields.each do |field_name, field|
         current_object[field.fid] = public_send(field_name)
@@ -211,7 +211,7 @@ module QuickbaseRecord
 
       if current_object[3] #object has a record_id, so we'll edit it
         remove_unwritable_fields(current_object)
-        qb_client.edit_record(self.class.dbid, self.id, current_object)
+        qb_client.edit_record(self.class.dbid, primary_key, current_object)
       else
         remove_unwritable_fields(current_object)
         new_rid = qb_client.add_record(self.class.dbid, current_object)
@@ -236,8 +236,8 @@ module QuickbaseRecord
       self.assign_attributes(attributes)
       updated_attributes = {}
       attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
-      record_id = public_send(record_id_field_name)
       primary_key = public_send(primary_key_field_name)
+      record_id = public_send(record_id_field_name)
 
       if record_id
         remove_unwritable_fields(updated_attributes)

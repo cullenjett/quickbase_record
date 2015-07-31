@@ -21,21 +21,24 @@ Or install it yourself as:
 ## Usage
 
 ### Initialize the API Client
-QuickbaseRecord is built on top of the [Advantage Quickbase](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem) gem to make the API calls to QuickBase, so you'll need to configure QuickbaseRecord with your app's realm name and provide a valid username and password. This can be done in a single initializer file with a call to `QuickbaseRecords.configure`, making sure to keep your credentials safe from the world.
+QuickbaseRecord is built on top of the [Advantage Quickbase](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem) gem to make the API calls to QuickBase, so you'll need to configure QuickbaseRecord with your app's realm name and provide a valid username, password, and token (if applicable). This can be done in a single initializer file with a call to `QuickbaseRecords.configure`.
 
 ```
   # config/initializers/quickbase_record.rb
 
   QuickbaseRecord.configure do |config|
-    config.realm = "your_apps_realm_name"
-    config.username = "valid_username" (or something like ENV["QB_USERNAME"])
-    config.password = "valid_password" (or something like ENV["QB_PASSWORD"])
-    config.token = "your_app_token_if_applicable"
+    config.realm = "quickbase_app_realm_name"
+    config.username = "valid_username"
+    config.password = "valid_password"
+    config.token = "quickbase_app_token_if_applicable"
   end
 ```
 
 ### Include it in your Class
-Simply `include QuickbaseRecord::Model` in your class and use the `.define_fields` method to supply the table's DBID and a mapping of desired field names => QuickBase FIDs
+Simply `include QuickbaseRecord::Model` in your class and use the `.define_fields` method to supply the table's DBID and a mapping of desired field names => QuickBase FIDs.
+
+**(NEW IN 0.4.0)**
+.define_fields follows a similar pattern to ActiveRecord migrations. It takes a block where data types and field names are definied with a corresponding QuickBase FID.
 
 ```
   # app/models/post.rb
@@ -43,17 +46,54 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
   class Post
     include QuickbaseRecord::Model
 
-    define_fields ({
-      dbid: 'abcde12345'
-      id: 3,
-      content: 7,
-      author: 8
+    define_fields do |t|
+      t.dbid 'abcde12345'
+      t.number :id, 3, :primary_key
+      t.string :content, 7
+      t.string :author, 8
+      t.string :title, 9
+      t.string :title_plus_author, 10, :read_only
     })
 
     # code...
   end
 ```
-**IMPORTANT:** You must supply a key/value pair for :dbid and :id (QuickbaseRecord uses :id instead of :record_id to look more like standard ActiveRecord models)
+
+### .define_fields
+.define_fields(:field_name, fid, *options)
+
+The following data types are currently supported:
+- "dbid"
+  - The dbid for the QuickBase table
+  - **Does not take multiple arguments, only a string of the dbid**
+- "string"
+  - All values are converted to a String
+- "number"
+  - All values are converted to a Numeric (and knows if it needs to be a float)
+- "date"
+  - All values are converted to a string representation of the date value: "07/30/2015" or nil for empty values
+- "file_attachment"
+  - Doesn't really do anything, only makes you feel better :) File attachments are explained below.
+
+Additional options may be added to field definitions:
+- :primary_key
+  - This is a required option for one field.
+- :read_only
+  - Fields marked as :read_only will not respond to #save or #update_attributes calls.
+  - Useful for formula/lookup/other fields in your QuickBase table that you can't write to.
+
+
+**IMPORTANT: You must supply a "dbid" data type and mark a single field as :primary_key**
+
+### Queries
+To query for records you can use the .find, .where, or .qid methods on the class. See below for examples.
+
+If you want to see the QuickBase query string output of a .where() argument you can pass your query hash to the .build_query() method and it will return the QuickBase query.
+
+```
+Post.build_query(author: 'Cullen', title: 'Some Title')
+=> "{'8'.EX.'Cullen'}AND{'9'.EX.'Some Title'}"
+```
 
 ### What You Get
 Classes that include QuickbaseRecord::Model and define their fields will have a handful of class and instance methods for interacting with your QuickBase application similar to ActiveRecord. The goal is to be able to use QuickBase as a database and treat your models the same way you would with a traditional database.
@@ -122,15 +162,6 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
     ```
       Post.where(author: {XEX: 'Cullen Jett'})
       # {'8'.XEX.'Cullen Jett'}
-    ```
-
-  * **.query(qb_query_string)**
-    - Accepts a string in the standard QuickBase query format
-    - Returns an array of objects
-    - Works with field names or FIDs
-    ```
-      Post.query("{'3'.EX.'1'}")
-      Post.query("{author.XEX.'Cullen Jett'}")
     ```
 
   * **.qid(id)**

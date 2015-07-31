@@ -31,5 +31,9 @@ RSpec.describe DateField do
       now_as_string = DateTime.now.strftime('%m/%d/%Y')
       expect(DateField.new.convert(now_in_ms)).to eq(now_as_string)
     end
+
+    it "returns nil when passed an empty string" do
+      expect(DateField.new.convert("")).to be_nil
+    end
   end
 end
