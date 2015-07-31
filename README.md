@@ -160,14 +160,38 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
     - Values in an array are joined with 'OR'
     ```
-      Post.where(author: ['Cullen Jett', 'Socrates')
-      # {'8'.EX.'Socrates'}OR{'8'.EX.'Socrates'}
+      Post.where(author: ['Cullen Jett', 'Socrates'])
+      # {'8'.EX.'Cullen Jett'}OR{'8'.EX.'Socrates'}
+
+      Post.where({ [author: 'Cullen Jett', id: 123] })
+      # {'8'.EX.'Cullen Jett'}OR{'3'.EX.'123'}
     ```
 
-    - To use a comparitor other than 'EX' pass the value as another hash with the key as the comparitor
+    - To use a comparator other than 'EX' pass the value as another hash with the key as the comparator
     ```
       Post.where(author: {XEX: 'Cullen Jett'})
       # {'8'.XEX.'Cullen Jett'}
+    ```
+
+    - Combine arrays and hashes to build more complex queries
+    ```
+      Post.where(id: [{XEX: 123}, {OBF: 'today'}])
+      # "{'3'.XEX.'123'}OR{'3'.OAF.'today'}"
+
+      Post.where(id: {XEX: 123, OAF: 'today'})
+      # "{'3'.XEX.'123'}AND{'3'.OAF.'today'}"
+    ```
+
+    - Also accepts a string in the standard QuickBase query format
+      * Works with field names or FIDs
+    ```
+      Post.where("{'3'.EX.'1'}")
+      Post.where("{author.XEX.'Cullen Jett'}")
+    ```
+
+    - To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
+    ```
+      Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author'})
     ```
 
   * **.qid(id)**
@@ -180,7 +204,6 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
   * **#save**
     - Creates a new record in QuickBase for objects that don't have an ID *or* edits the corresponding QuickBase record if the object already has an ID
     - Returns the object (if #save created a record in QuickBase the the returned object will now have an ID)
-    - Uses API_AddRecord or API_EditRecord depending on if the object has a [Record ID] (fid 3) value.
     ```
       @post = Post.new(content: 'Amazing post content', author: 'Cullen Jett')
       @post.save # => <Post: @id: 1, @content: 'Amazing post content', @author: 'Cullen Jett'
@@ -191,14 +214,15 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
 
   * **#delete**
     - Delete the corresponding record in QuickBase
-    - It returns the object's ID if successful or `false` if unsuccessful
+    - It returns the object if successful or `false` if unsuccessful
     ```
       @post = Post.find(1)
       @post.delete
     ```
 
   * **#update_attributes(attributes_hash)**
-    - ** IMPORTANT: Updates *and* saves the object with the new attributes**
+    - **IMPORTANT: Updates *and* saves the object with the new attributes**
+    - Only sends the passed in attributes as arguments to API_AddRecord or API_EditRecord (depending on whether the object has an ID or not)
     - Returns the object
     ```
       @post = Post.where(author: 'Cullen Jett').first
@@ -214,6 +238,18 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
       @post.assign_attributes(author: 'Socrates', content: 'Something enlightening...')
       @post.save
     ```
+
+  * **.qb_client and #qb_client**
+    - Access the quickbase API client (advantage_quickbase gem) directly
+
+## File Attachments
+When ***creating*** an object with a field of type 'file attachment', you must assign it as hash with :name and :file as keys.
+After the object is ***saved*** that field will then become a new hash with :filename and :url as keys.
+```
+  @post = Post.new(attachment: {name: 'Test File Name', file: 'path/to/your/file OR file contents'})
+  @post.save
+  @post.attachment => {filename: 'Test File Name', url: 'https://realm.quickbase.com/up/abcdefg/Test%20File%20Name'}
+```
 
 ## Testing
 Unfortunately you will not be able to run the test suite unless you have access to the QuickBase application used as the test database *or* you create your own QuickBase app to test against that mimics the test fakes. Eventually the test calls will be stubbed out so anyone can test it, but I've got stuff to do -- pull requests are welcome :)
