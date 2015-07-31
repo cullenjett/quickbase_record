@@ -20,6 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
+  * [Methods](#available-methods)
+
 ### Initialize the API Client
 QuickbaseRecord is built on top of the [Advantage Quickbase](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem) gem to make the API calls to QuickBase, so you'll need to configure QuickbaseRecord with your app's realm name and provide a valid username, password, and token (if applicable). This can be done in a single initializer file with a call to `QuickbaseRecords.configure`.
 
@@ -63,24 +65,28 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
 .define_fields(:field_name, fid, *options)
 
 The following data types are currently supported:
-- "dbid"
-  - The dbid for the QuickBase table
-  - **Does not take multiple arguments, only a string of the dbid**
-- "string"
-  - All values are converted to a String
-- "number"
-  - All values are converted to a Numeric (and knows if it needs to be a float)
-- "date"
-  - All values are converted to a string representation of the date value: "07/30/2015" or nil for empty values
-- "file_attachment"
-  - Doesn't really do anything, only makes you feel better :) File attachments are explained below.
+
+  * **dbid**
+    - The dbid for the QuickBase table
+    - **Does not take multiple arguments, only a string of the dbid**
+
+  * **string**
+    - All values are converted to a String
+
+  * **number**
+    - All values are converted to a Numeric (and knows if it needs to be a float)
+  * **date**
+    - All values are converted to a string representation of the date value: "07/30/2015" or nil for empty values
+  * **file_attachment**
+    - Doesn't really do anything, only makes you feel better :) File attachments are explained below.
 
 Additional options may be added to field definitions:
-- :primary_key
-  - This is a required option for one field.
-- :read_only
-  - Fields marked as :read_only will not respond to #save or #update_attributes calls.
-  - Useful for formula/lookup/other fields in your QuickBase table that you can't write to.
+
+  * **:primary_key**
+    - This is a required option for one field.
+  * **:read_only**
+    - Fields marked as :read_only will not respond to #save or #update_attributes calls.
+    - Useful for formula/lookup/other fields in your QuickBase table that you can't write to.
 
 
 **IMPORTANT: You must supply a "dbid" data type and mark a single field as :primary_key**
@@ -174,7 +180,7 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
   * **#save**
     - Creates a new record in QuickBase for objects that don't have an ID *or* edits the corresponding QuickBase record if the object already has an ID
     - Returns the object (if #save created a record in QuickBase the the returned object will now have an ID)
-    - Uses API_ImportFromCSV under the hood.
+    - Uses API_AddRecord or API_EditRecord depending on if the object has a [Record ID] (fid 3) value.
     ```
       @post = Post.new(content: 'Amazing post content', author: 'Cullen Jett')
       @post.save # => <Post: @id: 1, @content: 'Amazing post content', @author: 'Cullen Jett'
