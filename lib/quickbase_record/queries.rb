@@ -5,19 +5,19 @@ module QuickbaseRecord
     extend ActiveSupport::Concern
     include QuickbaseRecord::Client
 
-
     module ClassMethods
-      def dbid
-        @dbid ||= fields[:dbid]
-      end
-
       def clist
-        @clist ||= fields.reject{ |field_name| field_name == :dbid }.values.join('.')
+        @clist ||= fields.reject{ |field_name, field| field_name == :dbid }.values.collect {|field| field.fid }.join('.')
       end
 
-      def find(id, query_options = {})
+      def find(id, query_options={})
         query_options = build_query_options(query_options[:query_options])
-        clist = query_options.delete(:clist) if query_options[:clist]
+        if query_options[:clist]
+          clist = query_options.delete(:clist)
+        else
+          clist = self.clist
+        end
+
         query = { query: build_query(id: id), clist: clist }.merge(query_options)
         query_response = qb_client.do_query(dbid, query).first
 
@@ -34,7 +34,11 @@ module QuickbaseRecord
           options = {}
         end
 
-        clist = options.delete(:clist) if options[:clist]
+        if options[:clist]
+          clist = options.delete(:clist)
+        else
+          clist = self.clist
+        end
 
         query = { query: build_query(query_hash), clist: clist }.merge(options)
         query_response = qb_client.do_query(dbid, query)
@@ -44,7 +48,7 @@ module QuickbaseRecord
         build_collection(query_response)
       end
 
-      def create(attributes = {})
+      def create(attributes={})
         object = new(attributes)
         object.save
         return object
@@ -96,6 +100,25 @@ module QuickbaseRecord
             if result[option_name]
               result[option_name] << ".#{convert_field_name_to_fid(value)}"
             else
+              result[option_name] = convert_field_name_to_fid(value).to_s
+            end
+          end
+        end
+
+        return result
+      end
+
+      def build_collection(query_response)
+        query_response.map do |response|
+          converted_response = convert_quickbase_response(response)
+          new(converted_response)
+        end
+      end
+
+          value.split('.').each do |value|
+            if result[option_name]
+              result[option_name] << ".#{convert_field_name_to_fid(value)}"
+            else
               result[option_name] = convert_field_name_to_fid(value)
             end
           end
@@ -136,18 +159,20 @@ module QuickbaseRecord
       end
 
       def convert_field_name_to_fid(field_name)
-        self.fields[field_name.to_sym].to_s
+        fields[field_name.to_sym].fid
       end
 
-      def convert_fid_to_field_name(fid)
-        self.fields.invert[fid.to_i]
+      def covert_fid_to_field_name(fid)
+        fields.select { |field_name, field| field.fid == fid.to_i }.values.first.field_name
       end
 
       def convert_quickbase_response(response)
         result = {}
 
         response.each do |fid, value|
-          field_name = convert_fid_to_field_name(fid)
+          field = fields.select { |field_name, field| field.fid == fid.to_i }.values.first
+          field_name = field.field_name
+          value = field.convert(value)
           result[field_name] = value
         end
 
@@ -160,11 +185,11 @@ module QuickbaseRecord
 
         return query_string unless uses_field_name
 
-        fields.each do |field_name, fid|
-          field_name = field_name.to_s
+        fields.each do |field_name, field|
           match_string = "\{'?(#{field_name})'?\..*\.'?.*'?\}"
+
           if query_string.scan(/#{match_string}/).length > 0
-            query_string.gsub!(field_name, fid.to_s)
+            query_string.gsub!(field_name.to_s, field.fid.to_s)
             match_found = true
           end
         end
@@ -178,20 +203,33 @@ module QuickbaseRecord
     end
 
     # INSTANCE METHODS
+    def writable_fields
+      @writable_fields ||= self.class.fields.reject{ |field_name, field| field.options.include?(:read_only) }
+    end
+
+    def primary_key_field_name
+      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.keys.first
+    end
+
+    def record_id_field_name
+      @record_id_field_name ||= self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
+    end
+
     def save
+      primary_key = public_send(primary_key_field_name)
       current_object = {}
-      self.class.fields.each do |field_name, fid|
-        current_object[fid.to_s] = public_send(field_name)
+
+      self.class.fields.each do |field_name, field|
+        current_object[field.fid] = public_send(field_name)
       end
 
-      if current_object['3'] #object has a record_id, so we'll edit it
+      if current_object[3] #object has a record_id, so we'll edit it
         remove_unwritable_fields(current_object)
-        qb_client.edit_record(self.class.dbid, self.id, current_object)
+        qb_client.edit_record(self.class.dbid, primary_key, current_object)
       else
         remove_unwritable_fields(current_object)
         new_rid = qb_client.add_record(self.class.dbid, current_object)
-        id_field_name = self.class.fields.select { |field_name, fid| fid == 3 }.keys.first
-        public_send("#{id_field_name}=", new_rid)
+        public_send("#{record_id_field_name}=", new_rid)
       end
 
       return self
@@ -199,8 +237,7 @@ module QuickbaseRecord
 
     def delete
       # we have to use [record id] because of the advantage_quickbase gem
-      id_field_name = self.class.fields.select { |field_name, fid| fid == 3 }.keys.first
-      rid = public_send(id_field_name)
+      rid = public_send(record_id_field_name)
       return false unless rid
 
       successful = qb_client.delete_record(self.class.dbid, rid)
@@ -213,20 +250,27 @@ module QuickbaseRecord
       self.assign_attributes(attributes)
       updated_attributes = {}
       attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
-      updated_attributes.delete_if { |key, value| value.nil? }
 
-      if self.id
-        qb_client.edit_record(self.class.dbid, self.id, updated_attributes)
+      primary_key = public_send(primary_key_field_name)
+      record_id = public_send(record_id_field_name)
+
+      if record_id
+        remove_unwritable_fields(updated_attributes)
+        qb_client.edit_record(self.class.dbid, primary_key, updated_attributes)
       else
-        self.id = qb_client.add_record(self.class.dbid, updated_attributes)
+        remove_unwritable_fields(updated_attributes)
+        new_id = qb_client.add_record(self.class.dbid, updated_attributes)
+        public_send("#{record_id_field_name}=", new_id)
       end
 
       return self
     end
 
     def remove_unwritable_fields(hash)
-      hash.delete_if do |key, value|
-        value.nil? || key.to_i <= 5 || key == :dbid
+      writable_fids = writable_fields.values.collect { |field| field.fid }
+
+      hash.delete_if do |fid, value|
+        value.nil? || !writable_fids.include?(fid)
       end
     end
   end

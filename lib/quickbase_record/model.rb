@@ -1,3 +1,5 @@
+require_relative 'table_definition'
+
 module QuickbaseRecord
   module Model
     extend ActiveSupport::Concern
@@ -13,13 +15,13 @@ module QuickbaseRecord
     end
 
     module ClassMethods
+      attr_accessor :fields, :dbid
 
-      def fields(fields_hash={})
-        @fields ||= FieldMapping.new(fields_hash).fields
-      end
-
-      def define_fields(fields)
-        fields(fields)
+      def define_fields
+        table_definition = TableDefinition.new
+        yield table_definition
+        @dbid = table_definition.fields[:dbid]
+        @fields = table_definition.fields.reject { |field_name, field| field_name == :dbid }
       end
     end
 
@@ -33,7 +35,7 @@ module QuickbaseRecord
     end
 
     def create_attr_accesssors
-      self.class.fields.each do |field_name, value|
+      self.class.fields.each do |field_name, field|
         self.class.send(:attr_accessor, field_name)
       end
     end

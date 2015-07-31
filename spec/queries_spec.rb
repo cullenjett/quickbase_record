@@ -5,7 +5,7 @@ RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
     it "finds a single Teacher given an ID" do
       teacher = TeacherFake.find(1)
-      expect(teacher.id).to eq("1")
+      expect(teacher.id).to eq(1)
     end
 
     it "returns an object of the Teacher class" do
@@ -37,12 +37,12 @@ RSpec.describe QuickbaseRecord::Queries do
 
     it "accepts a string in QuickBase query format" do
       teachers = TeacherFake.where("{'3'.EX.'1'}")
-      expect(teachers.first.id).to eq('1')
+      expect(teachers.first.id).to eq(1)
     end
 
     it "accepts a string in QuickBase query format using field names" do
       teachers = TeacherFake.where("{'id'.EX.'1'}")
-      expect(teachers.first.id).to eq('1')
+      expect(teachers.first.id).to eq(1)
     end
 
     it "returns an empty array if no QuickBase records are found" do
@@ -51,7 +51,7 @@ RSpec.describe QuickbaseRecord::Queries do
     end
 
     it "accepts query options" do
-      teachers = TeacherFake.where(subject: ['Gym', 'Biology'], query_options: {slist: 'subject', options: 'sortorder-D'})
+      teachers = TeacherFake.where(subject: ['Biology', 'Gym'], query_options: {slist: 'subject', options: 'sortorder-D'})
       expect(teachers.first.subject).to eq('Gym')
     end
 
@@ -83,6 +83,13 @@ RSpec.describe QuickbaseRecord::Queries do
   end
 
   describe '#save' do
+    it "doesn't save :read_only fields" do
+      classroom = ClassroomFake.find(101)
+      classroom.assign_attributes(subject_plus_room: "this shouldn't save")
+      classroom.save
+      expect(ClassroomFake.find(101).subject_plus_room).not_to eq("this shouldn't save")
+    end
+
     context "when record ID is the primary key" do
       it "creates a new record in QuickBase for an object without an ID and sets it's new ID" do
         cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
@@ -114,17 +121,17 @@ RSpec.describe QuickbaseRecord::Queries do
 
     context "when record ID is not the primary key" do
       it "creates a new record if the object doesn't have a record ID" do
-        math = ClassroomFake.new(id: '1', subject: 'Math')
+        math = ClassroomFake.new(id: 1, subject: 'Math')
         math.save
-        expect(ClassroomFake.find('1')).not_to be_nil
+        expect(ClassroomFake.find(1)).not_to be_nil
         math.delete
       end
 
       it "sets the object's record id for new records" do
-        english = ClassroomFake.new(id: '2', subject: 'English', date_created: 'this should not save')
+        english = ClassroomFake.new(id: 2, subject: 'English', date_created: 'this should not save')
         english.save
         expect(english.record_id).to be_present
-        expect(english.record_id).not_to eq('2')
+        expect(english.record_id).not_to eq(2)
         english.delete
       end
 
@@ -153,7 +160,7 @@ RSpec.describe QuickbaseRecord::Queries do
 
     context "when record ID is not the primary key" do
       it "deletes the record from QuickBase" do
-        gym = ClassroomFake.new(id: '3', subject: 'Gym')
+        gym = ClassroomFake.new(id: 3, subject: 'Gym')
         gym.save
         expect(gym.delete).to eq(gym)
       end
@@ -195,6 +202,12 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher = TeacherFake.new()
       teacher.update_attributes()
       expect(teacher.update_attributes()).to be false
+    end
+
+    it "doesn't save :read_only attributes" do
+      classroom = ClassroomFake.find(101)
+      classroom.update_attributes(subject_plus_room: "this shouldn't save")
+      expect(ClassroomFake.find(101).subject_plus_room).not_to eq("this shouldn't save")
     end
   end
 
@@ -254,7 +267,7 @@ RSpec.describe QuickbaseRecord::Queries do
 
   describe '.build_query_options' do
     it "returns a hash" do
-      options = {clist: '1.2.3'}
+      options = {clist: 'id.salary'}
       expect(TeacherFake.build_query_options(options)).to be_a Hash
     end
 
