@@ -190,14 +190,23 @@ module QuickbaseRecord
       end
     end
 
+    def primary_key_field
+      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.first
+    end
+
+    def writable_fields
+      @writable_fields ||= self.class.fields.reject{ |field_name, field| field.options.include?(:read_only) }
+    end
+
     # INSTANCE METHODS
+    # TODO: convert data before sending to to quickbase
     def save
       current_object = {}
       self.class.fields.each do |field_name, field|
-        current_object[field.fid.to_s] = public_send(field_name)
+        current_object[field.fid] = public_send(field_name)
       end
 
-      if current_object['3'] #object has a record_id, so we'll edit it
+      if current_object[3] #object has a record_id, so we'll edit it
         remove_unwritable_fields(current_object)
         qb_client.edit_record(self.class.dbid, self.id, current_object)
       else
@@ -238,8 +247,10 @@ module QuickbaseRecord
     end
 
     def remove_unwritable_fields(hash)
-      hash.delete_if do |key, value|
-        value.nil? || key.to_i <= 5 || key == :dbid
+      writable_fids = writable_fields.values.collect { |field| field.fid }
+
+      hash.delete_if do |fid, value|
+        value.nil? || !writable_fids.include?(fid)
       end
     end
   end

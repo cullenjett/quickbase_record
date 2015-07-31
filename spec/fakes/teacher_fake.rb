@@ -5,7 +5,7 @@ class TeacherFake
 
   define_fields do |t|
     t.dbid "bjzrx8cjn"
-    t.number :id, 3
+    t.number :id, 3, :primary_key, :read_only
     t.string :name, 6
     t.string :subject, 7
     t.number :salary, 8

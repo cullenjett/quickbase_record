@@ -14,28 +14,28 @@ class TableDefinition
     fields[:dbid] = dbid_string
   end
 
-  def string(field_name, fid, options={})
+  def string(field_name, fid, *options)
     field_name = field_name.to_sym
     fid = fid.to_i
 
     fields[field_name] = StringField.new(field_name: field_name, fid: fid, options: options)
   end
 
-  def number(field_name, fid, options={})
+  def number(field_name, fid, *options)
     field_name = field_name.to_sym
     fid = fid.to_i
 
     fields[field_name] = NumberField.new(field_name: field_name, fid: fid, options: options)
   end
 
-  def file_attachment(field_name, fid, options={})
+  def file_attachment(field_name, fid, *options)
     field_name = field_name.to_sym
     fid = fid.to_i
 
     fields[field_name] = FileAttachmentField.new(field_name: field_name, fid: fid, options: options)
   end
 
-  def date(field_name, fid, options={})
+  def date(field_name, fid, *options)
     field_name = field_name.to_sym
     fid = fid.to_i
 

@@ -83,6 +83,13 @@ RSpec.describe QuickbaseRecord::Queries do
   end
 
   describe '#save' do
+    it "doesn't save :read_only fields" do
+      classroom = ClassroomFake.find(101)
+      classroom.assign_attributes(subject_plus_room: "this shouldn't save")
+      classroom.save
+      expect(ClassroomFake.find(101).subject_plus_room).not_to eq("this shouldn't save")
+    end
+
     context "when record ID is the primary key" do
       it "creates a new record in QuickBase for an object without an ID and sets it's new ID" do
         cullen = TeacherFake.new(name: 'Cullen Jett', salary: '1,000,000.00')
