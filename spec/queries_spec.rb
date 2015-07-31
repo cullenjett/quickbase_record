@@ -203,6 +203,12 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher.update_attributes()
       expect(teacher.update_attributes()).to be false
     end
+
+    it "doesn't save :read_only attributes" do
+      classroom = ClassroomFake.find(101)
+      classroom.update_attributes(subject_plus_room: "this shouldn't save")
+      expect(ClassroomFake.find(101).subject_plus_room).not_to eq("this shouldn't save")
+    end
   end
 
   # This is sort of a private method, but it seems pretty important so I'm keeping these tests.

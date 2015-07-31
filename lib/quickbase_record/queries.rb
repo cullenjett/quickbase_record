@@ -190,12 +190,16 @@ module QuickbaseRecord
       end
     end
 
-    def primary_key_field
-      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.first
+    def primary_key_field_name
+      @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.keys.first
     end
 
     def writable_fields
       @writable_fields ||= self.class.fields.reject{ |field_name, field| field.options.include?(:read_only) }
+    end
+
+    def record_id_field_name
+      @record_id_field_name ||= self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
     end
 
     # INSTANCE METHODS
@@ -212,8 +216,8 @@ module QuickbaseRecord
       else
         remove_unwritable_fields(current_object)
         new_rid = qb_client.add_record(self.class.dbid, current_object)
-        id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
-        public_send("#{id_field_name}=", new_rid)
+        # record_id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
+        public_send("#{record_id_field_name}=", new_rid)
       end
 
       return self
@@ -221,8 +225,8 @@ module QuickbaseRecord
 
     def delete
       # we have to use [record id] because of the advantage_quickbase gem
-      id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
-      rid = public_send(id_field_name)
+      # record_id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
+      rid = public_send(record_id_field_name)
       return false unless rid
 
       successful = qb_client.delete_record(self.class.dbid, rid)
@@ -234,13 +238,17 @@ module QuickbaseRecord
 
       self.assign_attributes(attributes)
       updated_attributes = {}
-      # attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
-      # updated_attributes.delete_if { |key, value| value.nil? }
+      attributes.each { |field_name, value| updated_attributes[self.class.convert_field_name_to_fid(field_name)] = value }
+      record_id = public_send(record_id_field_name)
+      primary_key = public_send(primary_key_field_name)
 
-      if self.id
-        qb_client.edit_record(self.class.dbid, self.id, updated_attributes)
+      if record_id
+        remove_unwritable_fields(updated_attributes)
+        qb_client.edit_record(self.class.dbid, primary_key, updated_attributes)
       else
-        self.id = qb_client.add_record(self.class.dbid, updated_attributes)
+        remove_unwritable_fields(updated_attributes)
+        new_id = qb_client.add_record(self.class.dbid, updated_attributes)
+        public_send("#{record_id_field_name}=", new_id)
       end
 
       return self
