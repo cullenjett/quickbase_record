@@ -190,6 +190,7 @@ module QuickbaseRecord
       end
     end
 
+    # INSTANCE METHODS
     def primary_key_field_name
       @primary_key_field ||= self.class.fields.select { |field_name, field| field.options.include?(:primary_key) }.keys.first
     end
@@ -202,8 +203,6 @@ module QuickbaseRecord
       @record_id_field_name ||= self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
     end
 
-    # INSTANCE METHODS
-    # TODO: convert data before sending to to quickbase
     def save
       current_object = {}
       self.class.fields.each do |field_name, field|
@@ -216,7 +215,6 @@ module QuickbaseRecord
       else
         remove_unwritable_fields(current_object)
         new_rid = qb_client.add_record(self.class.dbid, current_object)
-        # record_id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
         public_send("#{record_id_field_name}=", new_rid)
       end
 
@@ -225,7 +223,6 @@ module QuickbaseRecord
 
     def delete
       # we have to use [record id] because of the advantage_quickbase gem
-      # record_id_field_name = self.class.fields.select { |field_name, field| field.fid == 3 }.keys.first
       rid = public_send(record_id_field_name)
       return false unless rid
 
