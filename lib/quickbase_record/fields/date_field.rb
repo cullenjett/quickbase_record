@@ -6,6 +6,6 @@ class DateField < Field
   end
 
   def convert(value)
-    value
+    Time.at(value.to_i / 1000).strftime("%m/%d/%Y")
   end
 end
