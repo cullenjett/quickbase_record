@@ -62,6 +62,18 @@ module QuickbaseRecord
         build_array_of_new_objects(query_response)
       end
 
+      def save_collection(objects)
+        converted_objects = objects.map do |object|
+          current_object = {}
+          fields.each do |field_name, field|
+            current_object[field.fid] = object.send(field_name)
+          end
+          new.remove_unwritable_fields(current_object)
+        end
+
+        qb_client.import_from_csv(dbid, converted_objects)
+      end
+
       def build_query(query_hash)
         return convert_query_string(query_hash) if query_hash.is_a? String
 

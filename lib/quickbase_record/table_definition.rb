@@ -41,4 +41,11 @@ class TableDefinition
 
     fields[field_name] = DateField.new(field_name: field_name, fid: fid, options: options)
   end
+
+  def boolean(field_name, fid, *options)
+    field_name = field_name.to_sym
+    fid = fid.to_i
+
+    fields[field_name] = BooleanField.new(field_name: field_name, fid: fid, options: options)
+  end
 end

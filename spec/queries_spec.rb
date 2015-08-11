@@ -82,6 +82,14 @@ RSpec.describe QuickbaseRecord::Queries do
     end
   end
 
+  describe '.save_collection' do
+    it "does something" do
+      teacher1 = TeacherFake.new(name: 'Save collection teacher 1')
+      teacher2 = TeacherFake.new(name: 'Save collection teacher 2')
+      expect(TeacherFake.save_collection([teacher1, teacher2])).to be_truthy
+    end
+  end
+
   describe '#save' do
     it "doesn't save :read_only fields" do
       classroom = ClassroomFake.find(101)
