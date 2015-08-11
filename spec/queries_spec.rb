@@ -82,6 +82,13 @@ RSpec.describe QuickbaseRecord::Queries do
     end
   end
 
+  describe '.build_quickbase_request' do
+    it "converts an object to a hash of fid: value" do
+      teacher = TeacherFake.new(name: 'Mrs. Buttersworth', subject: 'Buttering')
+      expect(TeacherFake.build_quickbase_request(teacher)).to eq({6 => 'Mrs. Buttersworth', 7 => 'Buttering'})
+    end
+  end
+
   describe '.save_collection' do
     it "does something" do
       teacher1 = TeacherFake.new(name: 'Save collection teacher 1')

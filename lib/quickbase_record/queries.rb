@@ -63,15 +63,17 @@ module QuickbaseRecord
       end
 
       def save_collection(objects)
-        converted_objects = objects.map do |object|
-          current_object = {}
-          fields.each do |field_name, field|
-            current_object[field.fid] = object.send(field_name)
-          end
-          new.remove_unwritable_fields(current_object)
-        end
+        conveted_objects = objects.map { |obj| build_quickbase_request(obj) }
 
         qb_client.import_from_csv(dbid, converted_objects)
+      end
+
+      def build_quickbase_request(object)
+        converted_object = {}
+        fields.each do |field_name, field|
+          converted_object[field.fid] = object.send(field_name)
+        end
+        new.remove_unwritable_fields(converted_object)
       end
 
       def build_query(query_hash)
