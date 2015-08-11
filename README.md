@@ -77,6 +77,8 @@ The following data types are currently supported:
     - All values are converted to a Numeric (and knows if it needs to be a float)
   * **date**
     - All values are converted to a string representation of the date value: "07/30/2015" or nil for empty values
+  * **boolean**
+    - All values are converted to true or false (QuickBase returns "1" and "0")
   * **file_attachment**
     - Doesn't really do anything, only makes you feel better :) File attachments are explained below.
 
@@ -136,6 +138,17 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
     - Assigns the returned object it's new ID
     ```
       Post.create(content: 'Amazing post content', author: 'Cullen Jett')
+    ```
+
+  * **.save_collection(array_of_objects)**
+    - Save an array of objects (of the same class)
+    - Uses API_ImportFromCSV under the hood, so it will edit a record if it has a record ID or create one if not.
+    - Returns array of record IDs
+    ```
+      @post1 = Post.new(content: 'Amazing post content', author: 'Cullen Jett')
+      @post2 = Post.find(123)
+
+      Post.save_collection([@post1, @post2])
     ```
 
   * **.find(id)**
