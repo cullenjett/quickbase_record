@@ -71,7 +71,7 @@ module QuickbaseRecord
         qb_client.import_from_csv(dbid, converted_objects)
       end
 
-      def bulk_where(query_hash, count=1000)
+      def batch_where(query_hash, count=1000)
         all_query_results = []
         skip = 0
 

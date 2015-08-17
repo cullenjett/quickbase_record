@@ -103,35 +103,6 @@ Post.build_query(author: 'Cullen', title: 'Some Title')
 => "{'8'.EX.'Cullen'}AND{'9'.EX.'Some Title'}"
 ```
 
-### What You Get
-Classes that include QuickbaseRecord::Model and define their fields will have a handful of class and instance methods for interacting with your QuickBase application similar to ActiveRecord. The goal is to be able to use QuickBase as a database and treat your models the same way you would with a traditional database.
-
-```
-@post = Post.find(1) => <Post: @id=1, @content="Amazing post content", @author: 'Cullen Jett'>
-
---
-
-<%= form_for @post do |f| %>
-  # code...
-<% end %>
-
---
-
-@post = Post.where(author: 'Cullen Jett').first
-@post.update_attributes(author: 'THE Cullen Jett')
-
---
-
-etc.
-```
-
-
-Also included/extended are ActiveModel::Naming, ActiveModel::Callbacks, ActiveModel::Validations, and ActiveModel::Conversion ([see ActiveModel docs for details](https://github.com/rails/rails/tree/master/activemodel/lib/active_model)). The biggest benefit here is the availability of `.validates` on your class to validate attributes and capture invalid attributes with `#valid?`.
-
-Be aware that validations needing context from the database (i.e. `validates_uniqueness_of`) are not yet supported and will need to be implemented manually.
-
-Database callbacks (i.e. `before_save :create_token!`) are not fully functional yet, so stay tuned.
-
 ## Available Methods
   * **.create(attributes_hash)**
     - Intantiate *and* save a new object with the given attributes
@@ -205,6 +176,12 @@ Database callbacks (i.e. `before_save :create_token!`) are not fully functional 
     - To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
     ```
       Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author'})
+    ```
+
+  * **.batch_where(attributes_hash, count=1000)**
+    - Same as .where, but queries in batches of {count}
+    ```
+      Post.where({date_created: ['today', 'yesterday']}, 500) # note the necessary "{}" around the attributes_hash
     ```
 
   * **.qid(id)**
