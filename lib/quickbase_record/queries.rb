@@ -17,7 +17,10 @@ module QuickbaseRecord
         else
           clist = self.clist
         end
-        query = { query: build_query(id: id), clist: clist }.merge(query_options)
+        # TODO: ':id' in build_query needs to be the primary key field name instead
+        query_hash = {}
+        query_hash[self.new.primary_key_field_name] = id
+        query = { query: build_query(query_hash), clist: clist }.merge(query_options)
         query_response = qb_client.do_query(dbid, query).first
 
         return nil if query_response.nil?
@@ -63,9 +66,23 @@ module QuickbaseRecord
       end
 
       def save_collection(objects)
-        conveted_objects = objects.map { |obj| build_quickbase_request(obj) }
+        converted_objects = objects.map { |obj| build_quickbase_request(obj) }
 
         qb_client.import_from_csv(dbid, converted_objects)
+      end
+
+      def bulk_where(query_hash, count=1000)
+        all_query_results = []
+        skip = 0
+
+        begin
+          query = query_hash.merge(query_options: {options: "num-#{count}.skp-#{skip}"})
+          query_result = where(query)
+          all_query_results << query_result
+          skip += count
+        end until query_result.length < count
+
+        all_query_results.flatten
       end
 
       def build_quickbase_request(object)
