@@ -160,7 +160,7 @@ Post.build_query(author: 'Cullen', title: 'Some Title')
     - Combine arrays and hashes to build more complex queries
     ```
       Post.where(id: [{XEX: 123}, {OBF: 'today'}])
-      # "{'3'.XEX.'123'}OR{'3'.OAF.'today'}"
+      # "{'3'.XEX.'123'}OR{'3'.OBF.'today'}"
 
       Post.where(id: {XEX: 123, OAF: 'today'})
       # "{'3'.XEX.'123'}AND{'3'.OAF.'today'}"
@@ -175,7 +175,7 @@ Post.build_query(author: 'Cullen', title: 'Some Title')
 
     - To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
     ```
-      Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author'})
+      Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author', options: 'num-1'})
     ```
 
   * **.batch_where(attributes_hash, count=1000)**
