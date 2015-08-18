@@ -85,6 +85,17 @@ module QuickbaseRecord
         all_query_results.flatten
       end
 
+      def purge_records(query_hash)
+        query = {}
+        if query_hash.is_a? Numeric
+          query[:qid] = query_hash
+        else
+          query[:query] = build_query(query_hash)
+        end
+
+        query_response = qb_client.purge_records(dbid, query)
+      end
+
       def build_quickbase_request(object)
         converted_object = {}
         fields.each do |field_name, field|
