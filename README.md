@@ -137,7 +137,7 @@ You can also access the underlying instance of the AdvantageQuickbase client wit
       Post.find(params[:id])
     ```
 
-  * **.where(attributes_hash)**
+  * **.where(attributes_hash OR string)**
     - Query QuickBase by any field name defined in your class' field mapping
     - Returns an array of objects
     ```
@@ -181,7 +181,7 @@ You can also access the underlying instance of the AdvantageQuickbase client wit
       Post.where("{author.XEX.'Cullen Jett'}")
     ```
 
-    - To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
+    * **Query Options (clist, slist, options)** To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a hash of option_property: value
     ```
       Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author', options: 'num-1'})
     ```
@@ -216,6 +216,18 @@ You can also access the underlying instance of the AdvantageQuickbase client wit
     ```
       @post = Post.find(1)
       @post.delete
+    ```
+
+  * **.purge_records(attributes_hash OR QID)**
+    - Delete ALL records that match the attributes hash or are in the record corresponding to the QID argument
+    - Returns an array of deleted rids
+    - **CAUTION** If you do not supply a query parameter, this call will delete ALL of the records in the table.
+    ```
+      Post.purge_records(name: 'Cullen Jett') # attributes hash
+      or
+      Post.purge_records(9) # QID
+
+      => [1,2,3,4,5...]
     ```
 
   * **#update_attributes(attributes_hash)**

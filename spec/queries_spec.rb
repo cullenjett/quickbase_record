@@ -97,6 +97,21 @@ RSpec.describe QuickbaseRecord::Queries do
     end
   end
 
+  describe '.purge_records' do
+    it "deletes all matching query records" do
+      teacher1 = TeacherFake.create(name: 'I should be deleted')
+      TeacherFake.purge_records(name: teacher1.name)
+      expect(TeacherFake.find(teacher1.id)).to be_nil
+    end
+
+    it "accepts a QID" do
+      teacher1 = TeacherFake.create(name: 'Purge McSplurge')
+      expect(TeacherFake.qid(5).length).to eq(1)
+      TeacherFake.purge_records(5)
+      expect(TeacherFake.qid(5)).to eq([])
+    end
+  end
+
   describe '#save' do
     it "doesn't save :read_only fields" do
       classroom = ClassroomFake.find(101)
