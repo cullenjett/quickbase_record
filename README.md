@@ -103,6 +103,14 @@ Post.build_query(author: 'Cullen', title: 'Some Title')
 => "{'8'.EX.'Cullen'}AND{'9'.EX.'Some Title'}"
 ```
 
+You can also access the underlying instance of the AdvantageQuickbase client with .qb_client. This property lives on both the class and on any instance of that class. To access the dbid for the table, call .dbid on the class.
+
+```
+  Post.qb_client.do_query(...)
+  @post = Post.new(...)
+  @post.qb_client.edit_record(self.class.dbid, self.id, {5 => 'Something', 6 => 'Something else'})
+```
+
 ## Available Methods
   * **.create(attributes_hash)**
     - Intantiate *and* save a new object with the given attributes
