@@ -2,6 +2,7 @@ require 'quickbase_record/fields/string_field'
 require 'quickbase_record/fields/number_field'
 require 'quickbase_record/fields/date_field'
 require 'quickbase_record/fields/file_attachment_field'
+require 'quickbase_record/fields/boolean_field'
 
 class TableDefinition
   attr_accessor :fields
