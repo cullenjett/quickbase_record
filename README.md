@@ -55,7 +55,7 @@ Simply `include QuickbaseRecord::Model` in your class and use the `.define_field
       t.string :author, 8
       t.string :title, 9
       t.string :title_plus_author, 10, :read_only
-    })
+    end
 
     # code...
   end
