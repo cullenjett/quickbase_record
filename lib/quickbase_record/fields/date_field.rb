@@ -7,6 +7,6 @@ class DateField < Field
 
   def convert(value)
     return nil if value == ""
-    Time.at(value.to_i / 1000).strftime("%m/%d/%Y")
+    DateTime.strptime((value.to_i/1000).to_s, "%s").strftime("%m/%d/%Y")
   end
 end
