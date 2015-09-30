@@ -3,6 +3,11 @@ require './spec/fakes/classroom_fake'
 
 RSpec.describe QuickbaseRecord::Queries do
   describe '.find' do
+    it "calls do_query with the right arguments" do
+      expect(TeacherFake).to receive(:do_query)
+      TeacherFake.find(1)
+    end
+
     it "finds a single Teacher given an ID" do
       teacher = TeacherFake.find(1)
       expect(teacher.id).to eq(1)
