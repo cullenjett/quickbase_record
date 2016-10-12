@@ -62,6 +62,14 @@ RSpec.describe QuickbaseRecord::Queries do
     end
   end
 
+  describe '.batch_where' do
+    it "doesn't break query options" do
+      teachers = TeacherFake.batch_where({id: 1, query_options: {clist: 'id'}}, 1000)
+      expect(teachers.first.id).to eq(1)
+      expect(teachers.first.salary).not_to be_present
+    end
+  end
+
   describe '.create' do
     it "saves the object immediately" do
       teacher = TeacherFake.create(name: 'Professor Dumbledore')
@@ -108,7 +116,7 @@ RSpec.describe QuickbaseRecord::Queries do
       teacher1 = TeacherFake.create(name: 'Purge McSplurge')
       expect(TeacherFake.qid(5).length).to eq(1)
       TeacherFake.purge_records(5)
-      expect(TeacherFake.qid(5)).to eq([])
+      expect(TeacherFake.qid(5).length).to eq(0)
     end
   end
 

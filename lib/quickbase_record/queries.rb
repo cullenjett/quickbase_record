@@ -76,7 +76,10 @@ module QuickbaseRecord
         skip = 0
 
         begin
-          query = query_hash.merge(query_options: {options: "num-#{count}.skp-#{skip}"})
+          query_options = query_hash.delete(:query_options)
+          batch_options = {options: "num-#{count}.skp-#{skip}"}
+
+          query = query_hash.merge(query_options: query_options.merge(batch_options))
           query_result = where(query)
           all_query_results << query_result
           skip += count
