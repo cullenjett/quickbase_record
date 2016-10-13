@@ -74,7 +74,7 @@ module QuickbaseRecord
       def batch_where(query_hash, count=1000)
         all_query_results = []
         skip = 0
-        query_options = query_hash.delete(:query_options)
+        query_options = query_hash.delete(:query_options) || {}
 
         begin
           batch_options = {options: "num-#{count}.skp-#{skip}"}
