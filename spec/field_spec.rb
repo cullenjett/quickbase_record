@@ -32,8 +32,8 @@ RSpec.describe DateField do
       expect(DateField.new.convert(now_in_ms)).to eq(now_as_string)
     end
 
-    it "returns nil when passed an empty string" do
-      expect(DateField.new.convert("")).to be_nil
+    it "returns an empty string when passed an empty string" do
+      expect(DateField.new.convert("")).to eq("")
     end
   end
 end
