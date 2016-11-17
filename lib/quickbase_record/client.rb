@@ -10,11 +10,16 @@ module QuickbaseRecord
 
     def qb_client
       realm = QuickbaseRecord.configuration.realm
-      username = QuickbaseRecord.configuration.username
-      password = QuickbaseRecord.configuration.password
       token = QuickbaseRecord.configuration.token
 
-      @qb_client = AdvantageQuickbase::API.new(realm, username, password, token)
+      if QuickbaseRecord.configuration.username != ""
+        username = QuickbaseRecord.configuration.username
+        password = QuickbaseRecord.configuration.password
+      else
+        usertoken = QuickbaseRecord.configuration.usertoken
+      end
+
+      @qb_client = AdvantageQuickbase::API.new(realm, username, password, token, nil, usertoken)
     end
   end
 end
