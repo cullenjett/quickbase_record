@@ -20,8 +20,6 @@ Or install it yourself as:
 
 ## Setup
 
-  * [Methods](#available-methods)
-
 ### Initialize the API Client
 First you'll need to configure QuickbaseRecord with your app's realm name (realm-name.quickbase.com) and provide a valid username, password, and application token (if applicable). Alternatively, you can supply a user token. This can be done in a single initializer file with a call to `QuickbaseRecord.configure`.
 
