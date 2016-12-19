@@ -23,7 +23,7 @@ Or install it yourself as:
 ### Initialize the API Client
 First you'll need to configure QuickbaseRecord with your app's realm name (realm-name.quickbase.com) and provide a valid username, password, and application token (if applicable). Alternatively, you can supply a user token. This can be done in a single initializer file with a call to `QuickbaseRecord.configure`.
 
-```
+```ruby
   # config/initializers/quickbase_record.rb
 
   QuickbaseRecord.configure do |config|
@@ -43,7 +43,7 @@ Now you can simply `include QuickbaseRecord::Model` in a class representing a Qu
 
 `.define_fields` follows a similar pattern to ActiveRecord migrations. It takes a block where data types and field names are defined with a corresponding QuickBase Field ID.
 
-```
+```ruby
   # app/models/post.rb
 
   class Post
