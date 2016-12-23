@@ -38,7 +38,7 @@ First you'll need to configure QuickbaseRecord with your app's realm name (realm
   end
 ```
 
-### Include it in your Class
+### Include it in a Class
 Now you can simply `include QuickbaseRecord::Model` in a class representing a QuickBase table and call the `.define_fields` method to supply the table's Database ID and a mapping of desired field names => QuickBase Field IDs.
 
 `.define_fields` follows a similar pattern to ActiveRecord migrations. It takes a block where data types and field names are defined with a corresponding QuickBase Field ID.
@@ -94,9 +94,10 @@ Additional options may be added to field definitions:
 
 **IMPORTANT: You must supply a "dbid" data type and mark a single field as :primary_key. Weird shit can happen if you don't. Eventually I'll throw some errors if they're missing, but for now it's the wild west.**
 
+---
 ## Methods
-
-### Query for Records
+---
+## Query for Records
 
 * **.find(id)**
   ```ruby
@@ -153,13 +154,13 @@ Additional options may be added to field definitions:
     Post.qid(1)
   ```
 
-#### Query Options (clist, slist, options)
+##### Query Options (clist, slist, options)
   To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a key and a hash of `option_property: value` as values. An example is in order:
   ```ruby
     Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author', options: 'num-1'})
   ```
 
-#### Broken Query?
+##### Broken Query?
 If you want to see the QuickBase query string output of a `.where()` query hash you can pass your query hash to the `.build_query()` method and it will return the QuickBase query.
 
 ```ruby
@@ -167,7 +168,7 @@ If you want to see the QuickBase query string output of a `.where()` query hash 
   => "{'8'.EX.'Cullen'}AND{'9'.EX.'Some Title'}"
 ```
 
-#### AdvantageQuickbase
+##### AdvantageQuickbase
 QuickBaseRecord is built on top of the [AdvantageQuickbase gem](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem). You can access the underlying instance of the AdvantageQuickbase client with `.qb_client`. This property lives on both the class and on any instance of that class. To access the dbid for the table, call .dbid on the class.
 
 ```ruby
@@ -271,7 +272,7 @@ If you're lucky enough to work with me then I can grant you access to the app an
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/quickbase_record/fork )
+1. Fork it ( https://github.com/cullenjett/quickbase_record/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
