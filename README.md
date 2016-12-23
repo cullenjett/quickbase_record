@@ -154,13 +154,13 @@ Additional options may be added to field definitions:
     Post.qid(1)
   ```
 
-##### Query Options (clist, slist, options)
+#### Query Options (clist, slist, options)
   To query using the QuickBase query options such as 'clist', 'slist', or 'options', include :query_options as a key and a hash of `option_property: value` as values. An example is in order:
   ```ruby
     Post.where(author: ['Cullen Jett', 'Socrates'], query_options: {clist: 'id.author', slist: 'author', options: 'num-1'})
   ```
 
-##### Broken Query?
+#### Broken Query?
 If you want to see the QuickBase query string output of a `.where()` query hash you can pass your query hash to the `.build_query()` method and it will return the QuickBase query.
 
 ```ruby
@@ -168,7 +168,7 @@ If you want to see the QuickBase query string output of a `.where()` query hash 
   => "{'8'.EX.'Cullen'}AND{'9'.EX.'Some Title'}"
 ```
 
-##### AdvantageQuickbase
+#### AdvantageQuickbase
 QuickBaseRecord is built on top of the [AdvantageQuickbase gem](https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem). You can access the underlying instance of the AdvantageQuickbase client with `.qb_client`. This property lives on both the class and on any instance of that class. To access the dbid for the table, call .dbid on the class.
 
 ```ruby
